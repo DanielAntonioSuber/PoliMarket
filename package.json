@@ -1,0 +1,20 @@
+{
+  "name": "polimarket",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "Backend",
+    "Client"
+  ],
+  "scripts": {
+    "start": "concurrently \"npm run start:backend\" \"npm run start:client\"",
+    "start:backend": "npm run start --workspace=Backend",
+    "start:client": "npm run start --workspace=Client",
+    "install:all": "npm install && npm run install:backend && npm run install:client",
+    "install:backend": "npm install --workspace=Backend",
+    "install:client": "npm install --workspace=Client"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+} 

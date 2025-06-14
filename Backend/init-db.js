@@ -1,0 +1,112 @@
+const { Pool } = require('pg')
+const fs = require('fs')
+const path = require('path')
+require('dotenv').config()
+
+const pool = new Pool({
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT
+})
+
+async function initDb() {
+  try {
+    // Leer el archivo SQL
+    const sql = fs.readFileSync(path.join(__dirname, 'db.sql'), 'utf8')
+    
+    // Ejecutar el SQL
+    await pool.query(sql)
+    console.log('✅ Base de datos inicializada correctamente')
+    
+    // Obtener IDs de categorías
+    const categorias = await pool.query('SELECT id, nombre FROM categorias')
+    const categoriaMap = {}
+    categorias.rows.forEach(cat => {
+      categoriaMap[cat.nombre] = cat.id
+    })
+    
+    // Insertar productos de ejemplo
+    const productos = [
+      {
+        nombre: 'Smartphone XYZ',
+        descripcion: 'Último modelo con cámara de alta resolución',
+        precio: 8999.99,
+        imagen: 'https://example.com/smartphone.jpg',
+        categoria_id: categoriaMap['Electrónica'],
+        marca: 'TechBrand',
+        stock: 50
+      },
+      {
+        nombre: 'Camiseta Casual',
+        descripcion: 'Camiseta 100% algodón',
+        precio: 299.99,
+        imagen: 'https://example.com/camiseta.jpg',
+        categoria_id: categoriaMap['Ropa'],
+        marca: 'FashionCo',
+        stock: 100
+      },
+      {
+        nombre: 'Lámpara LED',
+        descripcion: 'Lámpara moderna con control de intensidad',
+        precio: 499.99,
+        imagen: 'https://example.com/lampara.jpg',
+        categoria_id: categoriaMap['Hogar'],
+        marca: 'HomeStyle',
+        stock: 30
+      },
+      {
+        nombre: 'Balón de Fútbol',
+        descripcion: 'Balón profesional talla 5',
+        precio: 399.99,
+        imagen: 'https://example.com/balon.jpg',
+        categoria_id: categoriaMap['Deportes'],
+        marca: 'SportPro',
+        stock: 75
+      },
+      {
+        nombre: 'Novela Bestseller',
+        descripcion: 'La novela más vendida del año',
+        precio: 199.99,
+        imagen: 'https://example.com/libro.jpg',
+        categoria_id: categoriaMap['Libros'],
+        marca: 'Editorial XYZ',
+        stock: 200
+      },
+      {
+        nombre: 'Set de Construcción',
+        descripcion: 'Juego de construcción para niños',
+        precio: 599.99,
+        imagen: 'https://example.com/juguete.jpg',
+        categoria_id: categoriaMap['Juguetes'],
+        marca: 'ToyWorld',
+        stock: 40
+      }
+    ]
+
+    for (const producto of productos) {
+      await pool.query(
+        `INSERT INTO productos (nombre, descripcion, precio, imagen, categoria_id, marca, stock)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          producto.nombre,
+          producto.descripcion,
+          producto.precio,
+          producto.imagen,
+          producto.categoria_id,
+          producto.marca,
+          producto.stock
+        ]
+      )
+    }
+    console.log('✅ Productos de ejemplo agregados')
+
+  } catch (error) {
+    console.error('❌ Error al inicializar la base de datos:', error)
+  } finally {
+    await pool.end()
+  }
+}
+
+initDb() 
