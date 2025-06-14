@@ -8,42 +8,13 @@ function Cart() {
   const { usuario } = useUser()
   const navigate = useNavigate()
 
-  const handleComprar = async () => {
+  const handleComprar = () => {
     if (!usuario) {
       alert('Debes iniciar sesión para finalizar la compra.')
       navigate('/login')
       return
     }
-
-    try {
-      const res = await fetch('http://localhost:3001/api/ordenes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          productos: carrito.map(item => ({
-            producto_id: item.id,
-            cantidad: item.cantidad,
-            precio_unitario: item.precio
-          }))
-        })
-      })
-
-      const data = await res.json()
-
-      if (res.ok) {
-        alert(`✅ Compra realizada con éxito. Orden #${data.orden_id}`)
-        limpiarCarrito()
-        navigate('/')
-      } else {
-        alert(`❌ Error: ${data.mensaje}`)
-      }
-    } catch (error) {
-      console.error('Error al procesar la compra:', error)
-      alert('❌ Error al procesar la compra. Por favor, intenta de nuevo.')
-    }
+    navigate('/checkout')
   }
 
   if (carrito.length === 0) {
@@ -82,10 +53,7 @@ function Cart() {
                 <div style={styles.precio}>
                   ${Number(item.precio).toFixed(2)}
                 </div>
-              </div>
-
-              <div style={styles.controles}>
-                <div style={styles.cantidad}>
+                <div style={styles.controles}>
                   <button 
                     onClick={() => actualizarCantidad(item.id, item.cantidad - 1)}
                     style={styles.botonCantidad}
@@ -93,57 +61,36 @@ function Cart() {
                   >
                     -
                   </button>
-                  <span style={styles.numeroCantidad}>{item.cantidad}</span>
+                  <span style={styles.cantidad}>{item.cantidad}</span>
                   <button 
                     onClick={() => actualizarCantidad(item.id, item.cantidad + 1)}
                     style={styles.botonCantidad}
                   >
                     +
                   </button>
+                  <button 
+                    onClick={() => eliminarDelCarrito(item.id)}
+                    style={styles.botonEliminar}
+                  >
+                    🗑️
+                  </button>
                 </div>
-
-                <div style={styles.subtotal}>
-                  Subtotal: ${Number(item.precio * item.cantidad).toFixed(2)}
-                </div>
-
-                <button 
-                  onClick={() => eliminarDelCarrito(item.id)}
-                  style={styles.botonEliminar}
-                >
-                  🗑️ Eliminar
-                </button>
               </div>
             </div>
           ))}
         </div>
 
         <div style={styles.resumen}>
-          <h2 style={styles.resumenTitulo}>Resumen de la compra</h2>
-          <div style={styles.resumenItem}>
-            <span>Subtotal:</span>
-            <span>${Number(total).toFixed(2)}</span>
-          </div>
-          <div style={styles.resumenItem}>
-            <span>Envío:</span>
-            <span>Gratis</span>
-          </div>
-          <div style={styles.resumenItem}>
+          <h2 style={styles.resumenTitulo}>Resumen de la Compra</h2>
+          <div style={styles.total}>
             <span>Total:</span>
-            <span style={styles.total}>${Number(total).toFixed(2)}</span>
+            <span>${total.toFixed(2)}</span>
           </div>
-
           <button 
             onClick={handleComprar}
             style={styles.botonComprar}
           >
-            Proceder al pago
-          </button>
-
-          <button 
-            onClick={() => navigate('/')}
-            style={styles.botonContinuar}
-          >
-            Continuar comprando
+            Proceder al Pago
           </button>
         </div>
       </div>
@@ -158,19 +105,15 @@ const styles = {
     margin: '0 auto'
   },
   titulo: {
-    color: '#003366',
-    marginBottom: '30px',
-    textAlign: 'center'
-  },
-  mensaje: {
+    color: '#8B0000',
     textAlign: 'center',
-    color: '#666',
-    marginBottom: '20px'
+    marginBottom: '30px',
+    fontSize: '2em'
   },
   contenido: {
-    display: 'grid',
-    gridTemplateColumns: '2fr 1fr',
-    gap: '30px'
+    display: 'flex',
+    gap: '30px',
+    flexDirection: 'column'
   },
   listaProductos: {
     display: 'flex',
@@ -178,143 +121,134 @@ const styles = {
     gap: '20px'
   },
   producto: {
-    display: 'grid',
-    gridTemplateColumns: 'auto 1fr auto',
+    display: 'flex',
     gap: '20px',
     padding: '20px',
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
     borderRadius: '10px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+    border: '1px solid #e0e0e0'
   },
   imagen: {
-    width: '100px',
-    height: '100px',
+    width: '120px',
+    height: '120px',
     objectFit: 'cover',
-    borderRadius: '5px'
+    borderRadius: '8px'
   },
   detalles: {
+    flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    gap: '5px'
+    gap: '10px'
   },
   nombre: {
-    margin: 0,
-    color: '#003366'
+    fontSize: '1.2em',
+    fontWeight: 'bold',
+    color: '#333'
   },
   descripcion: {
     color: '#666',
     fontSize: '0.9em'
   },
   precio: {
-    color: '#003366',
+    fontSize: '1.1em',
     fontWeight: 'bold',
-    fontSize: '1.1em'
+    color: '#8B0000'
   },
   controles: {
     display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-    gap: '10px'
-  },
-  cantidad: {
-    display: 'flex',
     alignItems: 'center',
-    gap: '10px'
+    gap: '10px',
+    marginTop: '10px'
   },
   botonCantidad: {
-    backgroundColor: '#003366',
-    color: 'white',
+    backgroundColor: '#8B0000',
+    color: '#fff',
     border: 'none',
-    width: '30px',
-    height: '30px',
+    padding: '5px 10px',
     borderRadius: '5px',
     cursor: 'pointer',
-    fontSize: '1.2em',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    fontSize: '1.1em',
     '&:disabled': {
       backgroundColor: '#ccc',
       cursor: 'not-allowed'
     }
   },
-  numeroCantidad: {
-    fontSize: '1.2em',
+  cantidad: {
+    fontSize: '1.1em',
     fontWeight: 'bold',
     minWidth: '30px',
     textAlign: 'center'
   },
-  subtotal: {
-    color: '#003366',
-    fontWeight: 'bold'
-  },
   botonEliminar: {
-    backgroundColor: '#dc3545',
-    color: 'white',
+    backgroundColor: '#DC143C',
+    color: '#fff',
     border: 'none',
     padding: '5px 10px',
     borderRadius: '5px',
     cursor: 'pointer',
-    fontSize: '0.9em'
+    fontSize: '1.1em'
   },
   resumen: {
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
     padding: '20px',
     borderRadius: '10px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    position: 'sticky',
-    top: '20px'
+    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+    border: '1px solid #e0e0e0'
   },
   resumenTitulo: {
-    color: '#003366',
-    marginTop: 0,
+    color: '#8B0000',
     marginBottom: '20px',
-    textAlign: 'center'
-  },
-  resumenItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '10px',
-    padding: '10px 0',
-    borderBottom: '1px solid #eee'
+    fontSize: '1.5em'
   },
   total: {
-    color: '#003366',
+    display: 'flex',
+    justifyContent: 'space-between',
+    fontSize: '1.2em',
     fontWeight: 'bold',
-    fontSize: '1.2em'
+    marginBottom: '20px',
+    padding: '10px 0',
+    borderTop: '2px solid #8B0000',
+    borderBottom: '2px solid #8B0000'
   },
   botonComprar: {
-    backgroundColor: '#ffd700',
-    color: '#003366',
+    backgroundColor: '#8B0000',
+    color: '#fff',
     border: 'none',
     padding: '15px',
-    borderRadius: '5px',
+    borderRadius: '8px',
     cursor: 'pointer',
+    fontSize: '1.1em',
     fontWeight: 'bold',
     width: '100%',
-    marginTop: '20px',
-    fontSize: '1.1em',
-    transition: 'all 0.2s ease',
+    transition: 'all 0.3s ease',
     '&:hover': {
-      backgroundColor: '#ffed4a',
-      transform: 'scale(1.02)'
+      backgroundColor: '#B22222',
+      transform: 'translateY(-2px)',
+      boxShadow: '0 4px 8px rgba(139, 0, 0, 0.2)'
     }
   },
+  mensaje: {
+    textAlign: 'center',
+    color: '#666',
+    marginBottom: '20px'
+  },
   botonContinuar: {
-    backgroundColor: '#003366',
-    color: 'white',
+    backgroundColor: '#8B0000',
+    color: '#fff',
     border: 'none',
-    padding: '15px',
-    borderRadius: '5px',
+    padding: '12px 25px',
+    borderRadius: '8px',
     cursor: 'pointer',
-    fontWeight: 'bold',
-    width: '100%',
-    marginTop: '10px',
     fontSize: '1.1em',
-    transition: 'all 0.2s ease',
+    fontWeight: 'bold',
+    display: 'block',
+    margin: '0 auto',
+    transition: 'all 0.3s ease',
     '&:hover': {
-      backgroundColor: '#004080',
-      transform: 'scale(1.02)'
+      backgroundColor: '#B22222',
+      transform: 'translateY(-2px)',
+      boxShadow: '0 4px 8px rgba(139, 0, 0, 0.2)'
     }
   }
 }

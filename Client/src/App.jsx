@@ -6,6 +6,7 @@ import Register from './pages/Register'
 import Cart from './pages/Cart'
 import AdminDashboard from './pages/AdminDashboard'
 import RutaProtegidaAdmin from './components/RutaProtegidaAdmin'
+import Checkout from './pages/Checkout'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/carrito" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
         <Route
           path="/admin"
           element={
