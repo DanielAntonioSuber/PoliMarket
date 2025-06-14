@@ -173,13 +173,16 @@ function AdminDashboard() {
 
         {mostrarFormulario && (
           <form onSubmit={handleSubmit} style={styles.formulario}>
-            <h3>{editandoId ? '✏️ Editar Producto' : '➕ Nuevo Producto'}</h3>
+            <h3 style={{ color: '#8B0000', marginBottom: '20px', textAlign: 'center' }}>
+              {editandoId ? '✏️ Editar Producto' : '➕ Nuevo Producto'}
+            </h3>
             <input 
               type="text" 
               placeholder="Nombre" 
               value={form.nombre} 
               onChange={e => setForm({ ...form, nombre: e.target.value })} 
               required 
+              style={styles.input}
             />
             <textarea 
               placeholder="Descripción" 
@@ -193,12 +196,14 @@ function AdminDashboard() {
               value={form.precio} 
               onChange={e => setForm({ ...form, precio: e.target.value })} 
               required 
+              style={styles.input}
             />
             <input 
               type="text" 
               placeholder="URL de imagen" 
               value={form.imagen} 
               onChange={e => setForm({ ...form, imagen: e.target.value })} 
+              style={styles.input}
             />
             <button type="submit" style={styles.botonGuardar}>
               {editandoId ? 'Actualizar' : 'Guardar'} Producto
@@ -298,125 +303,201 @@ const styles = {
   contenedor: {
     padding: '20px',
     maxWidth: '1200px',
-    margin: '0 auto'
+    margin: '0 auto',
+    backgroundColor: '#fff',
+    minHeight: '100vh'
   },
   seccion: {
     marginBottom: '40px',
     backgroundColor: '#fff',
-    borderRadius: '10px',
-    padding: '20px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    borderRadius: '15px',
+    padding: '25px',
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+    border: '1px solid #e0e0e0'
   },
   header: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '20px'
+    marginBottom: '25px',
+    padding: '15px',
+    backgroundColor: '#8B0000',
+    borderRadius: '10px',
+    color: '#fff'
   },
   formulario: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '10px',
-    maxWidth: '500px',
-    margin: '20px 0',
-    padding: '20px',
-    backgroundColor: '#f8f9fa',
-    borderRadius: '8px'
+    gap: '15px',
+    maxWidth: '600px',
+    margin: '25px auto',
+    padding: '30px',
+    backgroundColor: '#fff',
+    borderRadius: '15px',
+    boxShadow: '0 4px 15px rgba(139, 0, 0, 0.1)',
+    border: '2px solid #8B0000'
   },
   textarea: {
-    minHeight: '100px',
-    padding: '8px',
-    borderRadius: '4px',
-    border: '1px solid #ddd'
+    minHeight: '120px',
+    padding: '12px',
+    borderRadius: '8px',
+    border: '2px solid #8B0000',
+    fontSize: '16px',
+    fontFamily: 'inherit',
+    resize: 'vertical',
+    '&:focus': {
+      outline: 'none',
+      borderColor: '#B22222',
+      boxShadow: '0 0 0 3px rgba(139, 0, 0, 0.2)'
+    }
   },
   tabla: {
-    overflowX: 'auto'
+    overflowX: 'auto',
+    backgroundColor: '#fff',
+    borderRadius: '10px',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
   },
   th: {
-    backgroundColor: '#f8f9fa',
-    padding: '12px',
+    backgroundColor: '#8B0000',
+    color: '#fff',
+    padding: '15px',
     textAlign: 'left',
-    borderBottom: '2px solid #dee2e6'
+    borderBottom: '2px solid #B22222',
+    fontSize: '16px',
+    fontWeight: 'bold'
   },
   td: {
-    padding: '12px',
-    borderBottom: '1px solid #dee2e6',
-    verticalAlign: 'middle'
+    padding: '15px',
+    borderBottom: '1px solid #e0e0e0',
+    verticalAlign: 'middle',
+    fontSize: '15px'
   },
   imagenMiniatura: {
-    width: '50px',
-    height: '50px',
+    width: '60px',
+    height: '60px',
     objectFit: 'cover',
-    borderRadius: '4px'
+    borderRadius: '8px',
+    border: '2px solid #8B0000'
   },
   botonAgregar: {
-    backgroundColor: '#28a745',
-    color: 'white',
+    backgroundColor: '#8B0000',
+    color: '#fff',
     border: 'none',
-    padding: '10px 20px',
-    borderRadius: '5px',
-    cursor: 'pointer'
+    padding: '12px 25px',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      backgroundColor: '#B22222',
+      transform: 'translateY(-2px)',
+      boxShadow: '0 4px 8px rgba(139, 0, 0, 0.2)'
+    }
   },
   botonGuardar: {
-    backgroundColor: '#007bff',
-    color: 'white',
+    backgroundColor: '#8B0000',
+    color: '#fff',
     border: 'none',
-    padding: '10px 20px',
-    borderRadius: '5px',
-    cursor: 'pointer'
+    padding: '12px 25px',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    marginTop: '10px',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      backgroundColor: '#B22222',
+      transform: 'translateY(-2px)',
+      boxShadow: '0 4px 8px rgba(139, 0, 0, 0.2)'
+    }
   },
   botonEditar: {
-    backgroundColor: '#ffc107',
-    color: 'black',
+    backgroundColor: '#8B0000',
+    color: '#fff',
     border: 'none',
-    padding: '5px 10px',
-    borderRadius: '4px',
+    padding: '8px 15px',
+    borderRadius: '6px',
     cursor: 'pointer',
-    marginRight: '5px'
+    marginRight: '8px',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      backgroundColor: '#B22222',
+      transform: 'translateY(-2px)'
+    }
   },
   botonEliminar: {
-    backgroundColor: '#dc3545',
-    color: 'white',
+    backgroundColor: '#B22222',
+    color: '#fff',
     border: 'none',
-    padding: '5px 10px',
-    borderRadius: '4px',
-    cursor: 'pointer'
+    padding: '8px 15px',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      backgroundColor: '#DC143C',
+      transform: 'translateY(-2px)'
+    }
   },
   mensaje: {
-    padding: '10px',
-    borderRadius: '4px',
-    marginTop: '10px'
+    padding: '15px',
+    borderRadius: '8px',
+    marginTop: '15px',
+    backgroundColor: '#8B0000',
+    color: '#fff',
+    textAlign: 'center',
+    fontSize: '16px',
+    fontWeight: 'bold'
   },
   orden: {
-    border: '1px solid #dee2e6',
-    borderRadius: '8px',
-    padding: '15px',
-    marginBottom: '20px',
-    backgroundColor: '#f8f9fa'
+    border: '2px solid #8B0000',
+    borderRadius: '12px',
+    padding: '20px',
+    marginBottom: '25px',
+    backgroundColor: '#fff',
+    boxShadow: '0 4px 8px rgba(139, 0, 0, 0.1)'
   },
   titulo: {
-    fontSize: '2em',
-    marginBottom: '10px',
+    fontSize: '2.5em',
+    marginBottom: '20px',
     display: 'flex',
     alignItems: 'center',
-    gap: '5px'
+    gap: '10px',
+    color: '#8B0000',
+    textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
   },
   tituloPoli: {
-    color: '#003366',
+    color: '#8B0000',
     fontWeight: 'bold'
   },
   tituloMarket: {
-    color: '#ffd700',
+    color: '#B22222',
     fontWeight: 'bold'
   },
   tituloAdmin: {
-    color: '#666',
-    fontSize: '0.7em',
-    marginLeft: '10px'
+    color: '#8B0000',
+    fontSize: '0.8em',
+    marginLeft: '15px',
+    fontStyle: 'italic'
   },
   bienvenida: {
-    color: '#666',
-    marginBottom: '20px'
+    color: '#8B0000',
+    marginBottom: '25px',
+    fontSize: '18px',
+    fontWeight: 'bold'
+  },
+  input: {
+    padding: '12px',
+    borderRadius: '8px',
+    border: '2px solid #8B0000',
+    fontSize: '16px',
+    width: '100%',
+    transition: 'all 0.3s ease',
+    '&:focus': {
+      outline: 'none',
+      borderColor: '#B22222',
+      boxShadow: '0 0 0 3px rgba(139, 0, 0, 0.2)'
+    }
   }
 }
 
