@@ -57,4 +57,81 @@ router.post('/productos', verificarAdmin, async (req, res) => {
   }
 })
 
+// ✅ Obtener un producto específico
+router.get('/productos/:id', verificarAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM productos WHERE id = $1',
+      [req.params.id]
+    )
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Producto no encontrado' })
+    }
+    
+    res.json(result.rows[0])
+  } catch (error) {
+    console.error('Error al obtener producto:', error)
+    res.status(500).json({ error: 'Error al obtener el producto' })
+  }
+})
+
+// ✅ Actualizar un producto
+router.put('/productos/:id', verificarAdmin, async (req, res) => {
+  const { nombre, descripcion, precio, imagen } = req.body
+
+  if (!nombre || !precio) {
+    return res.status(400).json({ error: 'Faltan datos requeridos' })
+  }
+
+  try {
+    const result = await pool.query(
+      `UPDATE productos 
+       SET nombre = $1, descripcion = $2, precio = $3, imagen = $4
+       WHERE id = $5
+       RETURNING *`,
+      [nombre, descripcion, precio, imagen, req.params.id]
+    )
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Producto no encontrado' })
+    }
+
+    res.json(result.rows[0])
+  } catch (error) {
+    console.error('Error al actualizar producto:', error)
+    res.status(500).json({ error: 'Error al actualizar el producto' })
+  }
+})
+
+// ✅ Eliminar un producto
+router.delete('/productos/:id', verificarAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'DELETE FROM productos WHERE id = $1 RETURNING id',
+      [req.params.id]
+    )
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Producto no encontrado' })
+    }
+
+    res.json({ message: 'Producto eliminado correctamente' })
+  } catch (error) {
+    console.error('Error al eliminar producto:', error)
+    res.status(500).json({ error: 'Error al eliminar el producto' })
+  }
+})
+
+// ✅ Obtener todos los productos (vista admin)
+router.get('/productos', verificarAdmin, async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM productos ORDER BY nombre')
+    res.json(result.rows)
+  } catch (error) {
+    console.error('Error al obtener productos:', error)
+    res.status(500).json({ error: 'Error al obtener productos' })
+  }
+})
+
 module.exports = router
