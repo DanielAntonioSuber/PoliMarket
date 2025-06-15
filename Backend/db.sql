@@ -4,7 +4,15 @@ CREATE TABLE IF NOT EXISTS public.categorias (
     nombre VARCHAR(50) NOT NULL UNIQUE
 );
 
-ALTER TABLE public.categorias OWNER TO admin;
+ALTER TABLE public.categorias OWNER TO alvaro;
+
+-- Tabla: colores
+CREATE TABLE IF NOT EXISTS public.colores (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL UNIQUE
+);
+
+ALTER TABLE public.colores OWNER TO alvaro;
 
 -- Tabla: usuarios
 CREATE TABLE IF NOT EXISTS public.usuarios (
@@ -17,7 +25,7 @@ CREATE TABLE IF NOT EXISTS public.usuarios (
     rol VARCHAR(20) DEFAULT 'cliente'
 );
 
-ALTER TABLE public.usuarios OWNER TO admin;
+ALTER TABLE public.usuarios OWNER TO alvaro;
 
 -- Tabla: ordenes
 CREATE TABLE IF NOT EXISTS public.ordenes (
@@ -27,21 +35,23 @@ CREATE TABLE IF NOT EXISTS public.ordenes (
     total NUMERIC(10,2) NOT NULL
 );
 
-ALTER TABLE public.ordenes OWNER TO admin;
+ALTER TABLE public.ordenes OWNER TO alvaro;
 
 -- Tabla: productos
-CREATE TABLE IF NOT EXISTS public.productos (
+DROP TABLE IF EXISTS public.productos CASCADE;
+CREATE TABLE public.productos (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT,
     precio NUMERIC(10,2) NOT NULL,
     imagen VARCHAR(255),
     categoria_id INTEGER REFERENCES public.categorias(id),
+    color_id INTEGER REFERENCES public.colores(id),
     marca VARCHAR(100),
     stock INTEGER DEFAULT 0
 );
 
-ALTER TABLE public.productos OWNER TO admin;
+ALTER TABLE public.productos OWNER TO alvaro;
 
 -- Tabla: orden_detalle
 CREATE TABLE IF NOT EXISTS public.orden_detalle (
@@ -53,7 +63,7 @@ CREATE TABLE IF NOT EXISTS public.orden_detalle (
     cantidad INTEGER NOT NULL
 );
 
-ALTER TABLE public.orden_detalle OWNER TO admin;
+ALTER TABLE public.orden_detalle OWNER TO alvaro;
 
 -- Tabla: orden_productos
 CREATE TABLE IF NOT EXISTS public.orden_productos (
@@ -66,4 +76,20 @@ CREATE TABLE IF NOT EXISTS public.orden_productos (
     FOREIGN KEY (producto_id) REFERENCES public.productos(id)
 );
 
-ALTER TABLE public.orden_productos OWNER TO admin;
+ALTER TABLE public.orden_productos OWNER TO alvaro;
+
+-- Insertar categorías predefinidas
+INSERT INTO public.categorias (nombre) VALUES 
+('Ropa'),
+('Vasos'),
+('Accesorios')
+ON CONFLICT (nombre) DO NOTHING;
+
+-- Insertar colores predefinidos
+INSERT INTO public.colores (nombre) VALUES 
+('Guinda'),
+('Blanco'),
+('Negro'),
+('Azul'),
+('Rosa')
+ON CONFLICT (nombre) DO NOTHING;

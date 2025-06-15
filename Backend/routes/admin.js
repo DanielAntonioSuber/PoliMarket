@@ -37,20 +37,29 @@ router.get('/ordenes', verificarAdmin, async (req, res) => {
 
 // ✅ Agregar nuevo producto
 router.post('/productos', verificarAdmin, async (req, res) => {
-  const { nombre, descripcion, precio, imagen } = req.body
+  const { nombre, descripcion, precio, imagen, categoria_id } = req.body
 
-  if (!nombre || !precio) {
-    return res.status(400).json({ error: 'Faltan datos requeridos' })
+  if (!nombre || !precio || !categoria_id) {
+    return res.status(400).json({ error: 'Faltan datos requeridos: nombre, precio y categoría son obligatorios' })
   }
 
   try {
     const result = await pool.query(
-      `INSERT INTO productos (nombre, descripcion, precio, imagen)
-       VALUES ($1, $2, $3, $4)
-       RETURNING id`,
-      [nombre, descripcion, precio, imagen]
+      `INSERT INTO productos (nombre, descripcion, precio, imagen, categoria_id)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
+      [nombre, descripcion, precio, imagen, categoria_id]
     )
-    res.status(201).json({ id: result.rows[0].id })
+
+    // Obtener el producto creado con su categoría
+    const productoCreado = await pool.query(`
+      SELECT p.*, c.nombre as categoria 
+      FROM productos p 
+      LEFT JOIN categorias c ON p.categoria_id = c.id 
+      WHERE p.id = $1
+    `, [result.rows[0].id])
+
+    res.status(201).json(productoCreado.rows[0])
   } catch (error) {
     console.error('Error al agregar producto:', error)
     res.status(500).json({ error: 'Error al guardar el producto' })
@@ -78,26 +87,34 @@ router.get('/productos/:id', verificarAdmin, async (req, res) => {
 
 // ✅ Actualizar un producto
 router.put('/productos/:id', verificarAdmin, async (req, res) => {
-  const { nombre, descripcion, precio, imagen } = req.body
+  const { nombre, descripcion, precio, imagen, categoria_id } = req.body
 
-  if (!nombre || !precio) {
-    return res.status(400).json({ error: 'Faltan datos requeridos' })
+  if (!nombre || !precio || !categoria_id) {
+    return res.status(400).json({ error: 'Faltan datos requeridos: nombre, precio y categoría son obligatorios' })
   }
 
   try {
     const result = await pool.query(
       `UPDATE productos 
-       SET nombre = $1, descripcion = $2, precio = $3, imagen = $4
-       WHERE id = $5
+       SET nombre = $1, descripcion = $2, precio = $3, imagen = $4, categoria_id = $5
+       WHERE id = $6
        RETURNING *`,
-      [nombre, descripcion, precio, imagen, req.params.id]
+      [nombre, descripcion, precio, imagen, categoria_id, req.params.id]
     )
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Producto no encontrado' })
     }
 
-    res.json(result.rows[0])
+    // Obtener el producto actualizado con su categoría
+    const productoActualizado = await pool.query(`
+      SELECT p.*, c.nombre as categoria 
+      FROM productos p 
+      LEFT JOIN categorias c ON p.categoria_id = c.id 
+      WHERE p.id = $1
+    `, [req.params.id])
+
+    res.json(productoActualizado.rows[0])
   } catch (error) {
     console.error('Error al actualizar producto:', error)
     res.status(500).json({ error: 'Error al actualizar el producto' })

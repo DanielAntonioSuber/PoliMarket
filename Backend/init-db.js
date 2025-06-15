@@ -1,7 +1,21 @@
 const { Pool } = require('pg')
 const fs = require('fs')
 const path = require('path')
-require('dotenv').config()
+const dotenv = require('dotenv')
+
+// Cargar variables de entorno desde el archivo .env
+const envPath = path.resolve(__dirname, '.env')
+console.log('Buscando archivo .env en:', envPath)
+dotenv.config({ path: envPath })
+
+// Verificar que las variables de entorno se cargaron
+console.log('Variables de entorno cargadas:', {
+  DB_USER: process.env.DB_USER,
+  DB_HOST: process.env.DB_HOST,
+  DB_NAME: process.env.DB_NAME,
+  DB_PASSWORD: process.env.DB_PASSWORD ? '****' : 'no definida',
+  DB_PORT: process.env.DB_PORT
+})
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -14,9 +28,10 @@ const pool = new Pool({
 async function initDb() {
   try {
     // Leer el archivo SQL
-    const sql = fs.readFileSync(path.join(__dirname, 'db.sql'), 'utf8')
+    const sqlFile = path.join(__dirname, 'db.sql')
+    const sql = fs.readFileSync(sqlFile, 'utf8')
     
-    // Ejecutar el SQL
+    // Ejecutar el script SQL
     await pool.query(sql)
     console.log('✅ Base de datos inicializada correctamente')
     
