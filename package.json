@@ -1,19 +1,17 @@
 {
   "name": "polimarket",
   "version": "1.0.0",
-  "private": true,
-  "workspaces": [
-    "Backend",
-    "Client"
-  ],
+  "description": "Aplicación de PoliMarket",
+  "main": "index.js",
   "scripts": {
-    "start": "concurrently \"npm run start:backend\" \"npm run start:client\"",
-    "start:backend": "npm run start --workspace=Backend",
-    "start:client": "npm run start --workspace=Client",
-    "install:all": "npm install && npm run install:backend && npm run install:client",
-    "install:backend": "npm install --workspace=Backend",
-    "install:client": "npm install --workspace=Client"
+    "start": "concurrently \"cd Server && npm start\" \"cd Client && npm start\"",
+    "dev": "concurrently \"cd Server && npm run dev\" \"cd Client && npm run dev\"",
+    "install-all": "npm install && cd Client && npm install && cd ../Server && npm install",
+    "build": "cd Client && npm run build"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
     "concurrently": "^8.2.2"
   }
