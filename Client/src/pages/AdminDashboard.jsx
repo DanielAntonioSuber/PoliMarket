@@ -11,6 +11,7 @@ function AdminDashboard() {
   const [categorias, setCategorias] = useState([])
   const [colores, setColores] = useState([])
   const [mensaje, setMensaje] = useState('')
+  const [previewUrl, setPreviewUrl] = useState(null)
   const [form, setForm] = useState({
     nombre: '',
     descripcion: '',
@@ -84,18 +85,20 @@ function AdminDashboard() {
         ? `http://localhost:3001/api/admin/productos/${editandoId}`
         : 'http://localhost:3001/api/admin/productos'
       
-      // Asegurarse de que categoria_id y color_id sean números
+      // Preparar los datos según lo que espera el backend
       const formData = {
-        ...form,
-        categoria_id: parseInt(form.categoria_id),
-        color_id: parseInt(form.color_id)
+        nombre: form.nombre,
+        descripcion: form.descripcion || '',
+        precio: parseFloat(form.precio),
+        imagen: form.imagen || '',
+        categoria_id: parseInt(form.categoria_id)
       }
       
       const res = await fetch(url, {
         method: editandoId ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
-          rol: usuario.rol
+          'rol': 'admin'
         },
         body: JSON.stringify(formData)
       })
@@ -109,24 +112,53 @@ function AdminDashboard() {
         setProductos(dataProductos)
         
         // Limpiar formulario
-        setForm({
-          nombre: '',
-          descripcion: '',
-          precio: '',
-          imagen: '',
-          categoria_id: '',
-          color_id: '',
-          marca: '',
-          stock: ''
-        })
-        setEditandoId(null)
-        setMostrarFormulario(false)
+        limpiarFormulario()
       } else {
         setMensaje('❌ Error: ' + data.error)
       }
     } catch (err) {
+      console.error('Error:', err)
       setMensaje('❌ Error al conectar con el servidor')
     }
+  }
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      // Verificar que sea una imagen JPEG
+      if (file.type !== 'image/jpeg') {
+        alert('Por favor, selecciona una imagen en formato JPEG')
+        e.target.value = null
+        return
+      }
+      
+      // Crear URL para previsualización
+      const imageUrl = URL.createObjectURL(file)
+      setPreviewUrl(imageUrl)
+      
+      // Convertir la imagen a base64
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setForm({ ...form, imagen: reader.result })
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const limpiarFormulario = () => {
+    setForm({
+      nombre: '',
+      descripcion: '',
+      precio: '',
+      imagen: '',
+      categoria_id: '',
+      color_id: '',
+      marca: '',
+      stock: ''
+    })
+    setPreviewUrl(null)
+    setEditandoId(null)
+    setMostrarFormulario(false)
   }
 
   const handleEditar = (producto) => {
@@ -140,6 +172,7 @@ function AdminDashboard() {
       marca: producto.marca || '',
       stock: producto.stock || ''
     })
+    setPreviewUrl(producto.imagen || null)
     setEditandoId(producto.id)
     setMostrarFormulario(true)
   }
@@ -152,7 +185,10 @@ function AdminDashboard() {
     try {
       const res = await fetch(`http://localhost:3001/api/admin/productos/${id}`, {
         method: 'DELETE',
-        headers: { rol: usuario.rol }
+        headers: { 
+          'Content-Type': 'application/json',
+          'rol': 'admin'
+        }
       })
 
       if (res.ok) {
@@ -163,6 +199,7 @@ function AdminDashboard() {
         setMensaje('❌ Error: ' + data.error)
       }
     } catch (err) {
+      console.error('Error:', err)
       setMensaje('❌ Error al conectar con el servidor')
     }
   }
@@ -241,9 +278,13 @@ function AdminDashboard() {
                   <td style={styles.td}>
                     {p.imagen && (
                       <img 
-                        src={p.imagen} 
+                        src={p.imagen.startsWith('data:') ? p.imagen : `http://localhost:3001/${p.imagen}`} 
                         alt={p.nombre} 
                         style={styles.imagenMiniatura}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://via.placeholder.com/50';
+                        }}
                       />
                     )}
                   </td>
@@ -303,7 +344,7 @@ function AdminDashboard() {
       {/* Formulario de Producto */}
       {mostrarFormulario && (
         <>
-          <div style={styles.overlay} onClick={() => setMostrarFormulario(false)} />
+          <div style={styles.overlay} onClick={limpiarFormulario} />
           <div style={styles.formulario}>
             <h3 style={styles.tituloFormulario}>
               {editandoId ? '✏️ Editar Producto' : '➕ Nuevo Producto'}
@@ -358,31 +399,26 @@ function AdminDashboard() {
                     </option>
                   ))}
                 </select>
-                <input
-                  type="text"
-                  placeholder="URL de imagen"
-                  value={form.imagen}
-                  onChange={e => setForm({ ...form, imagen: e.target.value })}
-                  style={styles.input}
-                />
+                <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+                  <input
+                    type="file"
+                    accept="image/jpeg"
+                    onChange={handleImageChange}
+                    style={styles.inputFile}
+                  />
+                  {previewUrl && (
+                    <img 
+                      src={previewUrl} 
+                      alt="Vista previa" 
+                      style={styles.previewImagen}
+                    />
+                  )}
+                </div>
               </div>
               <div style={styles.botonesFormulario}>
                 <button
                   type="button"
-                  onClick={() => {
-                    setMostrarFormulario(false)
-                    setEditandoId(null)
-                    setForm({
-                      nombre: '',
-                      descripcion: '',
-                      precio: '',
-                      imagen: '',
-                      categoria_id: '',
-                      color_id: '',
-                      marca: '',
-                      stock: ''
-                    })
-                  }}
+                  onClick={limpiarFormulario}
                   style={styles.botonCancelar}
                 >
                   ❌ Cancelar
@@ -723,6 +759,34 @@ const styles = {
     marginBottom: '25px',
     fontSize: '18px',
     fontWeight: 'bold'
+  },
+  inputFile: {
+    width: '100%',
+    padding: '10px',
+    marginBottom: '12px',
+    border: '2px solid #8B0000',
+    borderRadius: '6px',
+    fontSize: '0.95rem',
+    transition: 'all 0.3s ease',
+    textAlign: 'center',
+    height: '40px',
+    boxSizing: 'border-box',
+    cursor: 'pointer',
+    backgroundColor: 'white',
+    ':focus': {
+      outline: 'none',
+      borderColor: '#8B0000',
+      boxShadow: '0 0 0 3px rgba(139, 0, 0, 0.2)'
+    }
+  },
+  previewImagen: {
+    width: '100px',
+    height: '100px',
+    objectFit: 'cover',
+    borderRadius: '6px',
+    border: '2px solid #8B0000',
+    margin: '10px auto',
+    display: 'block'
   }
 }
 

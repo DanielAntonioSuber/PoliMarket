@@ -14,6 +14,16 @@ export function CartProvider({ children }) {
     }
   }, [])
 
+  // Escuchar evento de logout
+  useEffect(() => {
+    const handleLogout = () => {
+      limpiarCarrito()
+    }
+
+    window.addEventListener('logout', handleLogout)
+    return () => window.removeEventListener('logout', handleLogout)
+  }, [])
+
   // Guardar carrito en localStorage cuando cambie
   useEffect(() => {
     localStorage.setItem('carrito', JSON.stringify(carrito))

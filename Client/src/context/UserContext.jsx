@@ -36,6 +36,8 @@ export function UserProvider({ children }) {
   function logout() {
     setUsuario(null)
     localStorage.removeItem('usuario')
+    // Disparar evento personalizado para limpiar el carrito
+    window.dispatchEvent(new CustomEvent('logout'))
   }
 
   async function register(nombre, email, password) {
