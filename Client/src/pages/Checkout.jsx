@@ -65,7 +65,8 @@ function Checkout() {
     ciudad: '',
     codigoPostal: '',
     tarjeta: '',
-    fechaVencimiento: '',
+    mesVencimiento: '',
+    añoVencimiento: '',
     cvv: ''
   })
   const [mensaje, setMensaje] = useState({ texto: '', tipo: '' })
@@ -74,15 +75,47 @@ function Checkout() {
   const handleChange = (e) => {
     const { name, value } = e.target
     
-    // Formatear fecha de vencimiento automáticamente
-    if (name === 'fechaVencimiento') {
-      let formattedValue = value.replace(/\D/g, '') // Eliminar caracteres no numéricos
-      if (formattedValue.length > 2) {
-        formattedValue = formattedValue.slice(0, 2) + '/' + formattedValue.slice(2, 4)
+    // Validar código postal (exactamente 5 dígitos)
+    if (name === 'codigoPostal') {
+      const soloNumeros = value.replace(/\D/g, '')
+      if (soloNumeros.length <= 5) {
+        setFormData(prev => ({
+          ...prev,
+          [name]: soloNumeros
+        }))
       }
+      return
+    }
+
+    // Validar mes de vencimiento (1-12)
+    if (name === 'mesVencimiento') {
+      const soloNumeros = value.replace(/\D/g, '')
+      if (soloNumeros === '' || (parseInt(soloNumeros) >= 1 && parseInt(soloNumeros) <= 12)) {
+        setFormData(prev => ({
+          ...prev,
+          [name]: soloNumeros
+        }))
+      }
+      return
+    }
+
+    // Validar año de vencimiento (2025-2035)
+    if (name === 'añoVencimiento') {
+      const soloNumeros = value.replace(/\D/g, '')
+      // Permitir escribir mientras se está escribiendo
       setFormData(prev => ({
         ...prev,
-        [name]: formattedValue
+        [name]: soloNumeros
+      }))
+      return
+    }
+
+    // Validar nombre y apellido (solo letras)
+    if (name === 'nombre' || name === 'apellido') {
+      const soloLetras = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')
+      setFormData(prev => ({
+        ...prev,
+        [name]: soloLetras
       }))
       return
     }
@@ -94,38 +127,38 @@ function Checkout() {
   }
 
   const validarFormulario = () => {
-    // Verificar que todos los campos estén llenos
-    const camposRequeridos = [
-      'nombre', 'apellido', 'email', 'direccion', 
-      'ciudad', 'codigoPostal', 'tarjeta', 
-      'fechaVencimiento', 'cvv'
-    ]
-
+    // Validar campos obligatorios
+    const camposRequeridos = ['nombre', 'apellido', 'email', 'direccion', 'ciudad', 'codigoPostal', 'tarjeta', 'mesVencimiento', 'añoVencimiento', 'cvv']
     for (const campo of camposRequeridos) {
-      if (!formData[campo].trim()) {
-        setMensaje({ texto: 'Por favor, complete todos los campos del formulario', tipo: 'error' })
+      if (!formData[campo]) {
+        setMensaje({ texto: 'Todos los campos son obligatorios', tipo: 'error' })
         return false
       }
     }
 
-    // Validar formato de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(formData.email)) {
-      setMensaje({ texto: 'Por favor, ingrese un email válido', tipo: 'error' })
+    // Validar código postal (exactamente 5 dígitos)
+    if (formData.codigoPostal.length !== 5) {
+      setMensaje({ texto: 'El código postal debe tener 5 dígitos', tipo: 'error' })
       return false
     }
 
-    // Validar formato de tarjeta (16 dígitos)
-    const tarjetaRegex = /^\d{16}$/
-    if (!tarjetaRegex.test(formData.tarjeta.replace(/\s/g, ''))) {
-      setMensaje({ texto: 'El número de tarjeta debe tener 16 dígitos', tipo: 'error' })
+    // Validar mes de vencimiento (1-12)
+    const mes = parseInt(formData.mesVencimiento)
+    if (mes < 1 || mes > 12) {
+      setMensaje({ texto: 'El mes debe estar entre 1 y 12', tipo: 'error' })
       return false
     }
 
-    // Validar formato de fecha (MM/YY)
-    const fechaRegex = /^\d{2}\/\d{2}$/
-    if (!fechaRegex.test(formData.fechaVencimiento)) {
-      setMensaje({ texto: 'La fecha de vencimiento debe tener el formato MM/YY', tipo: 'error' })
+    // Validar año de vencimiento (2025-2035)
+    const año = parseInt(formData.añoVencimiento)
+    if (año < 2025 || año > 2035) {
+      setMensaje({ texto: 'Ingresa fecha válida', tipo: 'error' })
+      return false
+    }
+
+    // Validar tarjeta vencida
+    if (año === 2025 && parseInt(formData.mesVencimiento) <= 5) {
+      setMensaje({ texto: 'Tarjeta vencida', tipo: 'error' })
       return false
     }
 
@@ -204,15 +237,27 @@ function Checkout() {
               <span>${(item.precio * item.cantidad).toFixed(2)}</span>
             </div>
           ))}
-          <div style={styles.total}>
-            <span>Total:</span>
+          <div style={styles.resumenItem}>
+            <span>Subtotal:</span>
             <span>${total.toFixed(2)}</span>
+          </div>
+          <div style={styles.resumenItem}>
+            <span>IVA (16%):</span>
+            <span>${(total * 0.16).toFixed(2)}</span>
+          </div>
+          <div style={styles.resumenItem}>
+            <span>Envío:</span>
+            <span>{total >= 1000 ? 'Gratis' : '$50.00'}</span>
+          </div>
+          <div style={styles.resumenItem}>
+            <span>Total:</span>
+            <span style={styles.total}>${(total >= 1000 ? total * 1.16 : (total * 1.16) + 50).toFixed(2)}</span>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.seccion}>
-            <h4 style={styles.seccionTitulo}>Información Personal</h4>
+            <h4 style={styles.seccionTitulo}>Información de Envío</h4>
             <div style={styles.inputGroup}>
               <input
                 type="text"
@@ -246,10 +291,6 @@ function Checkout() {
                 style={styles.input}
               />
             </div>
-          </div>
-
-          <div style={styles.seccion}>
-            <h4 style={styles.seccionTitulo}>Dirección de Envío</h4>
             <div style={styles.inputGroup}>
               <input
                 type="text"
@@ -280,6 +321,7 @@ function Checkout() {
                 value={formData.codigoPostal}
                 onChange={handleChange}
                 required
+                maxLength="5"
                 style={styles.input}
               />
             </div>
@@ -299,17 +341,31 @@ function Checkout() {
                 style={styles.input}
               />
             </div>
-            <div style={styles.inputGroup}>
-              <input
-                type="text"
-                name="fechaVencimiento"
-                placeholder="MM/YY"
-                value={formData.fechaVencimiento}
-                onChange={handleChange}
-                required
-                maxLength="5"
-                style={styles.input}
-              />
+            <div style={styles.fechaVencimiento}>
+              <div style={styles.inputGroup}>
+                <input
+                  type="text"
+                  name="mesVencimiento"
+                  placeholder="Mes"
+                  value={formData.mesVencimiento}
+                  onChange={handleChange}
+                  required
+                  maxLength="2"
+                  style={styles.input}
+                />
+              </div>
+              <div style={styles.inputGroup}>
+                <input
+                  type="text"
+                  name="añoVencimiento"
+                  placeholder="Año"
+                  value={formData.añoVencimiento}
+                  onChange={handleChange}
+                  required
+                  maxLength="4"
+                  style={styles.input}
+                />
+              </div>
             </div>
             <div style={styles.inputGroup}>
               <input
@@ -332,7 +388,7 @@ function Checkout() {
           )}
 
           <button type="submit" style={styles.button}>
-            Pagar ${total.toFixed(2)}
+            Pagar ${(total >= 1000 ? total * 1.16 : (total * 1.16) + 50).toFixed(2)}
           </button>
         </form>
       </div>
@@ -385,22 +441,26 @@ const styles = {
   form: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '30px'
+    gap: '30px',
+    width: '100%'
   },
   seccion: {
     backgroundColor: '#f8f9fa',
     padding: '20px',
     borderRadius: '10px',
-    border: '1px solid #e0e0e0'
+    border: '1px solid #e0e0e0',
+    width: '100%'
   },
   seccionTitulo: {
     color: '#8B0000',
     marginBottom: '15px',
     fontSize: '1.2em',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    textAlign: 'center'
   },
   inputGroup: {
-    marginBottom: '15px'
+    marginBottom: '15px',
+    width: '100%'
   },
   input: {
     width: '100%',
@@ -411,20 +471,56 @@ const styles = {
     transition: 'all 0.3s ease',
     outline: 'none',
     boxSizing: 'border-box',
+    textAlign: 'center',
     '&:focus': {
       borderColor: '#B22222',
       boxShadow: '0 0 0 3px rgba(139, 0, 0, 0.2)'
     }
   },
+  fechaVencimiento: {
+    display: 'flex',
+    gap: '10px',
+    width: '100%',
+    justifyContent: 'center'
+  },
+  resumen: {
+    backgroundColor: '#f8f9fa',
+    padding: '20px',
+    borderRadius: '10px',
+    border: '1px solid #e0e0e0',
+    marginBottom: '30px',
+    width: '100%'
+  },
+  resumenTitulo: {
+    color: '#8B0000',
+    marginBottom: '15px',
+    fontSize: '1.2em',
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+  resumenItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: '10px',
+    padding: '10px 0',
+    borderBottom: '1px solid #e0e0e0',
+    textAlign: 'center'
+  },
+  total: {
+    color: '#8B0000',
+    fontWeight: 'bold',
+    fontSize: '1.2em'
+  },
   button: {
     backgroundColor: '#8B0000',
     color: '#fff',
+    border: 'none',
     padding: '15px',
     borderRadius: '8px',
-    border: 'none',
-    fontSize: '16px',
-    fontWeight: 'bold',
     cursor: 'pointer',
+    fontSize: '1.1em',
+    fontWeight: 'bold',
+    width: '100%',
     transition: 'all 0.3s ease',
     '&:hover': {
       backgroundColor: '#B22222',
@@ -437,50 +533,14 @@ const styles = {
     textAlign: 'center',
     marginTop: '10px',
     fontSize: '14px',
-    fontWeight: 'bold',
-    backgroundColor: '#f8d7da',
-    padding: '10px',
-    borderRadius: '5px',
-    border: '1px solid #f5c6cb'
+    fontWeight: 'bold'
   },
   success: {
     color: '#28a745',
     textAlign: 'center',
     marginTop: '10px',
     fontSize: '14px',
-    fontWeight: 'bold',
-    backgroundColor: '#d4edda',
-    padding: '10px',
-    borderRadius: '5px',
-    border: '1px solid #c3e6cb'
-  },
-  resumen: {
-    backgroundColor: '#f8f9fa',
-    padding: '20px',
-    borderRadius: '10px',
-    marginBottom: '30px',
-    border: '1px solid #e0e0e0'
-  },
-  resumenTitulo: {
-    color: '#8B0000',
-    marginBottom: '15px',
-    fontSize: '1.2em',
     fontWeight: 'bold'
-  },
-  item: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    padding: '10px 0',
-    borderBottom: '1px solid #e0e0e0'
-  },
-  total: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    padding: '15px 0',
-    marginTop: '10px',
-    borderTop: '2px solid #8B0000',
-    fontWeight: 'bold',
-    fontSize: '1.2em'
   },
   mensaje: {
     textAlign: 'center',
@@ -551,6 +611,12 @@ const styles = {
     textAlign: 'center',
     color: '#666',
     fontSize: '0.9em'
+  },
+  item: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '10px 0',
+    borderBottom: '1px solid #e0e0e0'
   }
 }
 

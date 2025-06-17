@@ -82,9 +82,21 @@ function Cart() {
 
         <div style={styles.resumen}>
           <h2 style={styles.resumenTitulo}>Resumen de la Compra</h2>
-          <div style={styles.total}>
-            <span>Total:</span>
+          <div style={styles.resumenItem}>
+            <span>Subtotal:</span>
             <span>${total.toFixed(2)}</span>
+          </div>
+          <div style={styles.resumenItem}>
+            <span>IVA (16%):</span>
+            <span>${(total * 0.16).toFixed(2)}</span>
+          </div>
+          <div style={styles.resumenItem}>
+            <span>Envío:</span>
+            <span>{total >= 1000 ? 'Gratis' : '$50.00'}</span>
+          </div>
+          <div style={styles.resumenItem}>
+            <span>Total:</span>
+            <span style={styles.total}>${(total >= 1000 ? total * 1.16 : (total * 1.16) + 50).toFixed(2)}</span>
           </div>
           <button 
             onClick={handleComprar}
@@ -201,15 +213,17 @@ const styles = {
     marginBottom: '20px',
     fontSize: '1.5em'
   },
-  total: {
+  resumenItem: {
     display: 'flex',
     justifyContent: 'space-between',
-    fontSize: '1.2em',
-    fontWeight: 'bold',
-    marginBottom: '20px',
+    marginBottom: '10px',
     padding: '10px 0',
-    borderTop: '2px solid #8B0000',
-    borderBottom: '2px solid #8B0000'
+    borderBottom: '1px solid #eee'
+  },
+  total: {
+    color: '#8B0000',
+    fontWeight: 'bold',
+    fontSize: '1.2em'
   },
   botonComprar: {
     backgroundColor: '#8B0000',

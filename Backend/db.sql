@@ -17,15 +17,23 @@ ALTER TABLE public.colores OWNER TO alvaro;
 -- Tabla: usuarios
 CREATE TABLE IF NOT EXISTS public.usuarios (
     id SERIAL PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    apellido VARCHAR(100) NOT NULL,
-    fecha_nacimiento DATE NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
+    nombre VARCHAR(100) NOT NULL CHECK (nombre ~ '^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$'),
+    apellido VARCHAR(100) NOT NULL CHECK (apellido ~ '^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$'),
+    fecha_nacimiento DATE NOT NULL CHECK (fecha_nacimiento >= '1900-01-01' AND fecha_nacimiento <= '2025-12-31'),
+    email VARCHAR(100) NOT NULL UNIQUE CHECK (email ~ '^[^\s@]+@[^\s@]+\.[^\s@]{2,}$'),
     password_hash VARCHAR(255) NOT NULL,
     rol VARCHAR(20) DEFAULT 'cliente'
 );
 
 ALTER TABLE public.usuarios OWNER TO alvaro;
+
+-- Eliminar usuarios con datos inválidos
+DELETE FROM public.usuarios 
+WHERE nombre !~ '^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$' 
+   OR apellido !~ '^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$'
+   OR fecha_nacimiento < '1900-01-01' 
+   OR fecha_nacimiento > '2025-12-31'
+   OR email !~ '^[^\s@]+@[^\s@]+\.[^\s@]{2,}$';
 
 -- Tabla: ordenes
 CREATE TABLE IF NOT EXISTS public.ordenes (
@@ -43,12 +51,11 @@ CREATE TABLE public.productos (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT,
-    precio NUMERIC(10,2) NOT NULL,
-    imagen VARCHAR(255),
+    precio DECIMAL(10,2) NOT NULL,
+    stock INTEGER NOT NULL,
     categoria_id INTEGER REFERENCES public.categorias(id),
     color_id INTEGER REFERENCES public.colores(id),
-    marca VARCHAR(100),
-    stock INTEGER DEFAULT 0
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 ALTER TABLE public.productos OWNER TO alvaro;

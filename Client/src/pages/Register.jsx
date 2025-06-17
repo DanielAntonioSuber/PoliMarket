@@ -6,7 +6,9 @@ function Register() {
   const [form, setForm] = useState({
     nombre: '',
     apellido: '',
-    fecha_nacimiento: '',
+    dia: '',
+    mes: '',
+    año: '',
     email: '',
     password: ''
   })
@@ -15,7 +17,49 @@ function Register() {
   const [error, setError] = useState('')
 
   const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    
+    // Validaciones específicas para cada campo
+    if (name === 'nombre' || name === 'apellido') {
+      // Solo permite letras y espacios
+      const soloLetras = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')
+      setForm(prev => ({ ...prev, [name]: soloLetras }))
+      return
+    }
+
+    if (name === 'dia') {
+      // Solo permite números y valida rango 1-31
+      const soloNumeros = value.replace(/\D/g, '')
+      if (soloNumeros === '' || (parseInt(soloNumeros) >= 1 && parseInt(soloNumeros) <= 31)) {
+        setForm(prev => ({ ...prev, [name]: soloNumeros }))
+      }
+      return
+    }
+
+    if (name === 'mes') {
+      // Solo permite números y valida rango 1-12
+      const soloNumeros = value.replace(/\D/g, '')
+      if (soloNumeros === '' || (parseInt(soloNumeros) >= 1 && parseInt(soloNumeros) <= 12)) {
+        setForm(prev => ({ ...prev, [name]: soloNumeros }))
+      }
+      return
+    }
+
+    if (name === 'año') {
+      // Solo permite números y valida rango 1900-2025
+      const soloNumeros = value.replace(/\D/g, '')
+      // Permitir escribir mientras se está escribiendo
+      setForm(prev => ({ ...prev, [name]: soloNumeros }))
+      return
+    }
+
+    if (name === 'email') {
+      // Permitir escribir el correo y validar al enviar
+      setForm(prev => ({ ...prev, [name]: value }))
+      return
+    }
+
+    setForm(prev => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = async e => {
@@ -23,13 +67,53 @@ function Register() {
     setMensaje('')
     setError('')
 
+    // Validaciones antes de enviar
+    if (!form.nombre || !form.apellido || !form.dia || !form.mes || !form.año || !form.email || !form.password) {
+      setError('Todos los campos son obligatorios')
+      return
+    }
+
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+    if (!emailRegex.test(form.email)) {
+      setError('El correo electrónico debe tener un formato válido con al menos 2 caracteres después del punto')
+      return
+    }
+
+    // Validar fecha de nacimiento
+    const dia = parseInt(form.dia)
+    const mes = parseInt(form.mes)
+    const año = parseInt(form.año)
+
+    if (dia < 1 || dia > 31) {
+      setError('El día debe estar entre 1 y 31')
+      return
+    }
+    if (mes < 1 || mes > 12) {
+      setError('El mes debe estar entre 1 y 12')
+      return
+    }
+    if (año < 1900 || año > 2025) {
+      setError('Ingresa fecha válida')
+      return
+    }
+
+    // Construir la fecha en formato YYYY-MM-DD
+    const fecha_nacimiento = `${año}-${mes.toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`
+
     try {
       const res = await fetch('http://localhost:3001/api/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(form)
+        body: JSON.stringify({
+          nombre: form.nombre,
+          apellido: form.apellido,
+          fecha_nacimiento,
+          email: form.email,
+          password: form.password
+        })
       })
 
       const data = await res.json()
@@ -59,7 +143,8 @@ function Register() {
           <div style={styles.inputGroup}>
             <input 
               name="nombre" 
-              placeholder="Nombre" 
+              placeholder="Nombre (solo letras)" 
+              value={form.nombre}
               onChange={handleChange} 
               required 
               style={styles.input}
@@ -69,21 +154,50 @@ function Register() {
           <div style={styles.inputGroup}>
             <input 
               name="apellido" 
-              placeholder="Apellido" 
+              placeholder="Apellido (solo letras)" 
+              value={form.apellido}
               onChange={handleChange} 
               required 
               style={styles.input}
             />
           </div>
 
-          <div style={styles.inputGroup}>
-            <input 
-              name="fecha_nacimiento" 
-              type="date" 
-              onChange={handleChange} 
-              required 
-              style={styles.input}
-            />
+          <div style={styles.fechaNacimiento}>
+            <div style={styles.inputGroup}>
+              <input 
+                name="dia" 
+                type="text"
+                placeholder="Día (1-31)" 
+                value={form.dia}
+                onChange={handleChange} 
+                required 
+                style={styles.input}
+              />
+            </div>
+
+            <div style={styles.inputGroup}>
+              <input 
+                name="mes" 
+                type="text"
+                placeholder="Mes (1-12)" 
+                value={form.mes}
+                onChange={handleChange} 
+                required 
+                style={styles.input}
+              />
+            </div>
+
+            <div style={styles.inputGroup}>
+              <input 
+                name="año" 
+                type="text"
+                placeholder="Año (1900-2025)" 
+                value={form.año}
+                onChange={handleChange} 
+                required 
+                style={styles.input}
+              />
+            </div>
           </div>
 
           <div style={styles.inputGroup}>
@@ -91,6 +205,7 @@ function Register() {
               name="email" 
               type="email" 
               placeholder="Correo electrónico" 
+              value={form.email}
               onChange={handleChange} 
               required 
               style={styles.input}
@@ -102,6 +217,7 @@ function Register() {
               name="password" 
               type="password" 
               placeholder="Contraseña" 
+              value={form.password}
               onChange={handleChange} 
               required 
               style={styles.input}
@@ -185,6 +301,11 @@ const styles = {
     position: 'relative',
     width: '100%'
   },
+  fechaNacimiento: {
+    display: 'flex',
+    gap: '10px',
+    width: '100%'
+  },
   input: {
     width: '100%',
     padding: '15px',
@@ -223,10 +344,6 @@ const styles = {
     marginTop: '10px',
     fontSize: '14px',
     fontWeight: 'bold',
-    backgroundColor: '#d4edda',
-    padding: '10px',
-    borderRadius: '5px',
-    border: '1px solid #c3e6cb',
     width: '100%'
   },
   error: {
@@ -235,10 +352,6 @@ const styles = {
     marginTop: '10px',
     fontSize: '14px',
     fontWeight: 'bold',
-    backgroundColor: '#f8d7da',
-    padding: '10px',
-    borderRadius: '5px',
-    border: '1px solid #f5c6cb',
     width: '100%'
   },
   login: {
