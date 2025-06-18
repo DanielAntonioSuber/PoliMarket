@@ -63,21 +63,21 @@ router.post('/productos', verificarAdmin, upload.single('imagen'), async (req, r
   }
 
   try {
-    let imagenUrl = null
+    let url_imagen = null
     let imagenFileName = null
 
     // Si se subió una imagen, guardarla en Azure Blob Storage
     if (imagen) {
       const uploadResult = await uploadImageToAzure(imagen.buffer, imagen.originalname)
-      imagenUrl = uploadResult.url
+      url_imagen = uploadResult.url
       imagenFileName = uploadResult.fileName
     }
 
     const result = await pool.query(
-      `INSERT INTO productos (nombre, descripcion, precio, imagen, categoria_id)
+      `INSERT INTO productos (nombre, descripcion, precio, url_imagen, categoria_id)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [nombre, descripcion, precio, imagenUrl, categoria_id]
+      [nombre, descripcion, precio, url_imagen, categoria_id]
     )
 
     // Obtener el producto creado con su categoría
@@ -88,7 +88,7 @@ router.post('/productos', verificarAdmin, upload.single('imagen'), async (req, r
       WHERE p.id = $1
     `, [result.rows[0].id])
 
-    res.status(201).json({ ...productoCreado.rows[0], url_imagen: imagenUrl })
+    res.status(201).json({ ...productoCreado.rows[0] })
   } catch (error) {
     console.error('Error al agregar producto:', error)
     res.status(500).json({ error: 'Error al guardar el producto' })
@@ -107,7 +107,7 @@ router.get('/productos/:id', verificarAdmin, async (req, res) => {
       return res.status(404).json({ error: 'Producto no encontrado' })
     }
     
-    res.json({ ...result.rows[0], url_imagen: result.rows[0].imagen })
+    res.json(result.rows[0])
   } catch (error) {
     console.error('Error al obtener producto:', error)
     res.status(500).json({ error: 'Error al obtener el producto' })
@@ -126,7 +126,7 @@ router.put('/productos/:id', verificarAdmin, upload.single('imagen'), async (req
   try {
     // Obtener el producto actual para verificar si tiene imagen
     const productoActual = await pool.query(
-      'SELECT imagen FROM productos WHERE id = $1',
+      'SELECT url_imagen FROM productos WHERE id = $1',
       [req.params.id]
     )
 
@@ -134,14 +134,14 @@ router.put('/productos/:id', verificarAdmin, upload.single('imagen'), async (req
       return res.status(404).json({ error: 'Producto no encontrado' })
     }
 
-    let imagenUrl = productoActual.rows[0].imagen
+    let url_imagen = productoActual.rows[0].url_imagen
     let imagenFileName = null
 
     // Si se subió una nueva imagen
     if (imagen) {
       // Eliminar la imagen anterior de Azure si existe
-      if (imagenUrl) {
-        const fileName = extractFileNameFromUrl(imagenUrl)
+      if (url_imagen) {
+        const fileName = extractFileNameFromUrl(url_imagen)
         if (fileName) {
           await deleteImageFromAzure(fileName)
         }
@@ -149,16 +149,16 @@ router.put('/productos/:id', verificarAdmin, upload.single('imagen'), async (req
 
       // Subir la nueva imagen
       const uploadResult = await uploadImageToAzure(imagen.buffer, imagen.originalname)
-      imagenUrl = uploadResult.url
+      url_imagen = uploadResult.url
       imagenFileName = uploadResult.fileName
     }
 
     const result = await pool.query(
       `UPDATE productos 
-       SET nombre = $1, descripcion = $2, precio = $3, imagen = $4, categoria_id = $5
+       SET nombre = $1, descripcion = $2, precio = $3, url_imagen = $4, categoria_id = $5
        WHERE id = $6
        RETURNING *`,
-      [nombre, descripcion, precio, imagenUrl, categoria_id, req.params.id]
+      [nombre, descripcion, precio, url_imagen, categoria_id, req.params.id]
     )
 
     // Obtener el producto actualizado con su categoría
@@ -169,7 +169,7 @@ router.put('/productos/:id', verificarAdmin, upload.single('imagen'), async (req
       WHERE p.id = $1
     `, [req.params.id])
 
-    res.json({ ...productoActualizado.rows[0], url_imagen: imagenUrl })
+    res.json(productoActualizado.rows[0])
   } catch (error) {
     console.error('Error al actualizar producto:', error)
     res.status(500).json({ error: 'Error al actualizar el producto' })
@@ -181,7 +181,7 @@ router.delete('/productos/:id', verificarAdmin, async (req, res) => {
   try {
     // Obtener la imagen del producto antes de eliminarlo
     const producto = await pool.query(
-      'SELECT imagen FROM productos WHERE id = $1',
+      'SELECT url_imagen FROM productos WHERE id = $1',
       [req.params.id]
     )
 
@@ -190,8 +190,8 @@ router.delete('/productos/:id', verificarAdmin, async (req, res) => {
     }
 
     // Eliminar la imagen de Azure si existe
-    if (producto.rows[0].imagen) {
-      const fileName = extractFileNameFromUrl(producto.rows[0].imagen)
+    if (producto.rows[0].url_imagen) {
+      const fileName = extractFileNameFromUrl(producto.rows[0].url_imagen)
       if (fileName) {
         await deleteImageFromAzure(fileName)
       }
@@ -213,7 +213,7 @@ router.delete('/productos/:id', verificarAdmin, async (req, res) => {
 router.get('/productos', verificarAdmin, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM productos ORDER BY nombre')
-    res.json(result.rows.map(producto => ({ ...producto, url_imagen: producto.imagen })))
+    res.json(result.rows)
   } catch (error) {
     console.error('Error al obtener productos:', error)
     res.status(500).json({ error: 'Error al obtener productos' })

@@ -124,7 +124,7 @@ router.get('/colores', async (req, res) => {
 
 // Crear un nuevo producto
 router.post('/', async (req, res) => {
-    const { nombre, descripcion, precio, imagen, categoria_id, color_id, marca, stock } = req.body;
+    const { nombre, descripcion, precio, url_imagen, categoria_id, color_id, marca, stock } = req.body;
     
     if (!nombre || !precio || !categoria_id) {
         return res.status(400).json({ error: 'Faltan datos requeridos: nombre, precio y categoría son obligatorios' });
@@ -132,8 +132,8 @@ router.post('/', async (req, res) => {
 
     try {
         const result = await pool.query(
-            'INSERT INTO productos (nombre, descripcion, precio, imagen, categoria_id, color_id, marca, stock) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-            [nombre, descripcion, precio, imagen, categoria_id, color_id, marca, stock]
+            'INSERT INTO productos (nombre, descripcion, precio, url_imagen, categoria_id, color_id, marca, stock) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+            [nombre, descripcion, precio, url_imagen, categoria_id, color_id, marca, stock]
         );
 
         // Obtener el producto creado con sus relaciones
@@ -178,7 +178,7 @@ router.get('/:id', async (req, res) => {
 // Actualizar un producto
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { nombre, descripcion, precio, imagen, categoria_id, color_id, marca, stock } = req.body;
+    const { nombre, descripcion, precio, url_imagen, categoria_id, color_id, marca, stock } = req.body;
     
     if (!nombre || !precio || !categoria_id) {
         return res.status(400).json({ error: 'Faltan campos requeridos' });
@@ -187,11 +187,11 @@ router.put('/:id', async (req, res) => {
     try {
         const result = await pool.query(`
             UPDATE productos 
-            SET nombre = $1, descripcion = $2, precio = $3, imagen = $4, 
+            SET nombre = $1, descripcion = $2, precio = $3, url_imagen = $4, 
                 categoria_id = $5, color_id = $6, marca = $7, stock = $8
             WHERE id = $9
             RETURNING *
-        `, [nombre, descripcion, precio, imagen, categoria_id, color_id, marca, stock, id]);
+        `, [nombre, descripcion, precio, url_imagen, categoria_id, color_id, marca, stock, id]);
 
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Producto no encontrado' });

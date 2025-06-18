@@ -14,9 +14,9 @@ function ProductCard({ producto }) {
 
   return (
     <div style={styles.card}>
-      {producto.imagen && (
+      {(producto.url_imagen || producto.imagen) && (
         <img 
-          src={producto.imagen} 
+          src={producto.url_imagen || producto.imagen} 
           alt={producto.nombre} 
           style={styles.imagen}
         />

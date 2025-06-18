@@ -48,7 +48,7 @@ async function initDb() {
         nombre: 'Smartphone XYZ',
         descripcion: 'Último modelo con cámara de alta resolución',
         precio: 8999.99,
-        imagen: 'https://example.com/smartphone.jpg',
+        url_imagen: 'https://example.com/smartphone.jpg',
         categoria_id: categoriaMap['Electrónica'],
         marca: 'TechBrand',
         stock: 50
@@ -57,7 +57,7 @@ async function initDb() {
         nombre: 'Camiseta Casual',
         descripcion: 'Camiseta 100% algodón',
         precio: 299.99,
-        imagen: 'https://example.com/camiseta.jpg',
+        url_imagen: 'https://example.com/camiseta.jpg',
         categoria_id: categoriaMap['Ropa'],
         marca: 'FashionCo',
         stock: 100
@@ -66,7 +66,7 @@ async function initDb() {
         nombre: 'Lámpara LED',
         descripcion: 'Lámpara moderna con control de intensidad',
         precio: 499.99,
-        imagen: 'https://example.com/lampara.jpg',
+        url_imagen: 'https://example.com/lampara.jpg',
         categoria_id: categoriaMap['Hogar'],
         marca: 'HomeStyle',
         stock: 30
@@ -75,7 +75,7 @@ async function initDb() {
         nombre: 'Balón de Fútbol',
         descripcion: 'Balón profesional talla 5',
         precio: 399.99,
-        imagen: 'https://example.com/balon.jpg',
+        url_imagen: 'https://example.com/balon.jpg',
         categoria_id: categoriaMap['Deportes'],
         marca: 'SportPro',
         stock: 75
@@ -84,7 +84,7 @@ async function initDb() {
         nombre: 'Novela Bestseller',
         descripcion: 'La novela más vendida del año',
         precio: 199.99,
-        imagen: 'https://example.com/libro.jpg',
+        url_imagen: 'https://example.com/libro.jpg',
         categoria_id: categoriaMap['Libros'],
         marca: 'Editorial XYZ',
         stock: 200
@@ -93,7 +93,7 @@ async function initDb() {
         nombre: 'Set de Construcción',
         descripcion: 'Juego de construcción para niños',
         precio: 599.99,
-        imagen: 'https://example.com/juguete.jpg',
+        url_imagen: 'https://example.com/juguete.jpg',
         categoria_id: categoriaMap['Juguetes'],
         marca: 'ToyWorld',
         stock: 40
@@ -102,13 +102,13 @@ async function initDb() {
 
     for (const producto of productos) {
       await pool.query(
-        `INSERT INTO productos (nombre, descripcion, precio, imagen, categoria_id, marca, stock)
+        `INSERT INTO productos (nombre, descripcion, precio, url_imagen, categoria_id, marca, stock)
          VALUES ($1, $2, $3, $4, $5, $6, $7)`,
         [
           producto.nombre,
           producto.descripcion,
           producto.precio,
-          producto.imagen,
+          producto.url_imagen,
           producto.categoria_id,
           producto.marca,
           producto.stock

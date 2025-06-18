@@ -97,6 +97,10 @@ function AdminDashboard() {
       formData.append('stock', form.stock)
       formData.append('url_imagen', form.url_imagen)
       
+      if (selectedFile) {
+        formData.append('imagen', selectedFile)
+      }
+      
       const res = await fetch(url, {
         method: editandoId ? 'PUT' : 'POST',
         headers: {
@@ -128,9 +132,9 @@ function AdminDashboard() {
   const handleImageChange = (e) => {
     const file = e.target.files[0]
     if (file) {
-      // Verificar que sea una imagen JPEG
-      if (file.type !== 'image/jpeg') {
-        alert('Por favor, selecciona una imagen en formato JPEG')
+      // Verificar que sea una imagen JPEG o PNG
+      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        alert('Por favor, selecciona una imagen en formato JPEG o PNG')
         e.target.value = null
         return
       }
@@ -409,6 +413,15 @@ function AdminDashboard() {
                     </option>
                   ))}
                 </select>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png"
+                  onChange={handleImageChange}
+                  style={styles.inputFile}
+                />
+                {previewUrl && (
+                  <img src={previewUrl} alt="Previsualización" style={styles.previewImagen} />
+                )}
                 <input
                   type="text"
                   placeholder="URL de la imagen"

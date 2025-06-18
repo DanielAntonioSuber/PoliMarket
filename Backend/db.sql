@@ -52,14 +52,13 @@ CREATE TABLE public.productos (
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT,
     precio DECIMAL(10,2) NOT NULL,
-    stock INTEGER NOT NULL,
+    stock INTEGER NOT NULL DEFAULT 0,
     categoria_id INTEGER REFERENCES public.categorias(id),
     color_id INTEGER REFERENCES public.colores(id),
     url_imagen TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-ALTER TABLE public.productos OWNER TO alvaro;
 
 -- Tabla: orden_detalle
 CREATE TABLE IF NOT EXISTS public.orden_detalle (
@@ -71,8 +70,6 @@ CREATE TABLE IF NOT EXISTS public.orden_detalle (
     cantidad INTEGER NOT NULL
 );
 
-ALTER TABLE public.orden_detalle OWNER TO alvaro;
-
 -- Tabla: orden_productos
 CREATE TABLE IF NOT EXISTS public.orden_productos (
     orden_id INTEGER NOT NULL,
@@ -83,8 +80,6 @@ CREATE TABLE IF NOT EXISTS public.orden_productos (
     FOREIGN KEY (orden_id) REFERENCES public.ordenes(id),
     FOREIGN KEY (producto_id) REFERENCES public.productos(id)
 );
-
-ALTER TABLE public.orden_productos OWNER TO alvaro;
 
 -- Insertar categorías predefinidas
 INSERT INTO public.categorias (nombre) VALUES 

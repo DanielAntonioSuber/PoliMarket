@@ -107,7 +107,7 @@ const ProductList = () => {
                 {productos.map((producto) => (
                     <div key={producto.id} className="border rounded-lg p-4 shadow-sm">
                         <img
-                            src={producto.imagen}
+                            src={producto.url_imagen || producto.imagen}
                             alt={producto.nombre}
                             className="w-full h-48 object-cover rounded-lg mb-4"
                         />
