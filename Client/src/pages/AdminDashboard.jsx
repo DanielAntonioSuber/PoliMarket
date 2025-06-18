@@ -16,7 +16,6 @@ function AdminDashboard() {
     nombre: '',
     descripcion: '',
     precio: '',
-    imagen: '',
     categoria_id: '',
     color_id: '',
     marca: '',
@@ -24,6 +23,7 @@ function AdminDashboard() {
   })
   const [editandoId, setEditandoId] = useState(null)
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
+  const [selectedFile, setSelectedFile] = useState(null)
 
   useEffect(() => {
     if (!cargando) {
@@ -85,22 +85,25 @@ function AdminDashboard() {
         ? `http://localhost:3001/api/admin/productos/${editandoId}`
         : 'http://localhost:3001/api/admin/productos'
       
-      // Preparar los datos según lo que espera el backend
-      const formData = {
-        nombre: form.nombre,
-        descripcion: form.descripcion || '',
-        precio: parseFloat(form.precio),
-        imagen: form.imagen || '',
-        categoria_id: parseInt(form.categoria_id)
+      // Crear FormData para enviar archivos
+      const formData = new FormData()
+      formData.append('nombre', form.nombre)
+      formData.append('descripcion', form.descripcion || '')
+      formData.append('precio', form.precio)
+      formData.append('categoria_id', form.categoria_id)
+      
+      // Agregar archivo si se seleccionó uno
+      if (selectedFile) {
+        formData.append('imagen', selectedFile)
       }
       
       const res = await fetch(url, {
         method: editandoId ? 'PUT' : 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'rol': 'admin'
+          // No incluir Content-Type para que el navegador lo establezca automáticamente con el boundary
         },
-        body: JSON.stringify(formData)
+        body: formData
       })
       const data = await res.json()
       
@@ -132,16 +135,17 @@ function AdminDashboard() {
         return
       }
       
+      // Verificar tamaño del archivo (5MB máximo)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('La imagen debe ser menor a 5MB')
+        e.target.value = null
+        return
+      }
+      
       // Crear URL para previsualización
       const imageUrl = URL.createObjectURL(file)
       setPreviewUrl(imageUrl)
-      
-      // Convertir la imagen a base64
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setForm({ ...form, imagen: reader.result })
-      }
-      reader.readAsDataURL(file)
+      setSelectedFile(file)
     }
   }
 
@@ -150,13 +154,13 @@ function AdminDashboard() {
       nombre: '',
       descripcion: '',
       precio: '',
-      imagen: '',
       categoria_id: '',
       color_id: '',
       marca: '',
       stock: ''
     })
     setPreviewUrl(null)
+    setSelectedFile(null)
     setEditandoId(null)
     setMostrarFormulario(false)
   }
@@ -166,13 +170,13 @@ function AdminDashboard() {
       nombre: producto.nombre,
       descripcion: producto.descripcion || '',
       precio: producto.precio,
-      imagen: producto.imagen || '',
       categoria_id: producto.categoria_id || '',
       color_id: producto.color_id || '',
       marca: producto.marca || '',
       stock: producto.stock || ''
     })
     setPreviewUrl(producto.imagen || null)
+    setSelectedFile(null)
     setEditandoId(producto.id)
     setMostrarFormulario(true)
   }
@@ -242,12 +246,13 @@ function AdminDashboard() {
                   nombre: '',
                   descripcion: '',
                   precio: '',
-                  imagen: '',
                   categoria_id: '',
                   color_id: '',
                   marca: '',
                   stock: ''
                 })
+                setSelectedFile(null)
+                setPreviewUrl(null)
               }
             }}
             style={styles.botonAgregar}
@@ -278,7 +283,7 @@ function AdminDashboard() {
                   <td style={styles.td}>
                     {p.imagen && (
                       <img 
-                        src={p.imagen.startsWith('data:') ? p.imagen : `http://localhost:3001/${p.imagen}`} 
+                        src={p.imagen} 
                         alt={p.nombre} 
                         style={styles.imagenMiniatura}
                         onError={(e) => {
@@ -327,12 +332,13 @@ function AdminDashboard() {
                 nombre: '',
                 descripcion: '',
                 precio: '',
-                imagen: '',
                 categoria_id: '',
                 color_id: '',
                 marca: '',
                 stock: ''
               })
+              setSelectedFile(null)
+              setPreviewUrl(null)
             }}
             className="inline-flex items-center px-6 py-3 border-2 border-[#8B0000] text-[#8B0000] rounded-lg hover:bg-[#8B0000] hover:text-white transition-all duration-200 font-bold text-lg shadow-lg hover:shadow-xl"
           >

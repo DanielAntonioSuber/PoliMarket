@@ -2,6 +2,24 @@
 const express = require('express')
 const router = express.Router()
 const pool = require('../db')
+const multer = require('multer')
+const { uploadImageToAzure, deleteImageFromAzure, extractFileNameFromUrl } = require('../azure-storage')
+
+// Configurar multer para manejar archivos en memoria
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB máximo
+  },
+  fileFilter: (req, file, cb) => {
+    // Solo permitir imágenes JPEG
+    if (file.mimetype === 'image/jpeg') {
+      cb(null, true)
+    } else {
+      cb(new Error('Solo se permiten archivos JPEG'), false)
+    }
+  }
+})
 
 // Middleware para verificar si es admin
 const verificarAdmin = (req, res, next) => {
@@ -35,20 +53,31 @@ router.get('/ordenes', verificarAdmin, async (req, res) => {
   }
 })
 
-// ✅ Agregar nuevo producto
-router.post('/productos', verificarAdmin, async (req, res) => {
-  const { nombre, descripcion, precio, imagen, categoria_id } = req.body
+// ✅ Agregar nuevo producto con imagen en Azure Blob Storage
+router.post('/productos', verificarAdmin, upload.single('imagen'), async (req, res) => {
+  const { nombre, descripcion, precio, categoria_id } = req.body
+  const imagen = req.file
 
   if (!nombre || !precio || !categoria_id) {
     return res.status(400).json({ error: 'Faltan datos requeridos: nombre, precio y categoría son obligatorios' })
   }
 
   try {
+    let imagenUrl = null
+    let imagenFileName = null
+
+    // Si se subió una imagen, guardarla en Azure Blob Storage
+    if (imagen) {
+      const uploadResult = await uploadImageToAzure(imagen.buffer, imagen.originalname)
+      imagenUrl = uploadResult.url
+      imagenFileName = uploadResult.fileName
+    }
+
     const result = await pool.query(
       `INSERT INTO productos (nombre, descripcion, precio, imagen, categoria_id)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [nombre, descripcion, precio, imagen, categoria_id]
+      [nombre, descripcion, precio, imagenUrl, categoria_id]
     )
 
     // Obtener el producto creado con su categoría
@@ -85,26 +114,52 @@ router.get('/productos/:id', verificarAdmin, async (req, res) => {
   }
 })
 
-// ✅ Actualizar un producto
-router.put('/productos/:id', verificarAdmin, async (req, res) => {
-  const { nombre, descripcion, precio, imagen, categoria_id } = req.body
+// ✅ Actualizar un producto con imagen en Azure Blob Storage
+router.put('/productos/:id', verificarAdmin, upload.single('imagen'), async (req, res) => {
+  const { nombre, descripcion, precio, categoria_id } = req.body
+  const imagen = req.file
 
   if (!nombre || !precio || !categoria_id) {
     return res.status(400).json({ error: 'Faltan datos requeridos: nombre, precio y categoría son obligatorios' })
   }
 
   try {
+    // Obtener el producto actual para verificar si tiene imagen
+    const productoActual = await pool.query(
+      'SELECT imagen FROM productos WHERE id = $1',
+      [req.params.id]
+    )
+
+    if (productoActual.rows.length === 0) {
+      return res.status(404).json({ error: 'Producto no encontrado' })
+    }
+
+    let imagenUrl = productoActual.rows[0].imagen
+    let imagenFileName = null
+
+    // Si se subió una nueva imagen
+    if (imagen) {
+      // Eliminar la imagen anterior de Azure si existe
+      if (imagenUrl) {
+        const fileName = extractFileNameFromUrl(imagenUrl)
+        if (fileName) {
+          await deleteImageFromAzure(fileName)
+        }
+      }
+
+      // Subir la nueva imagen
+      const uploadResult = await uploadImageToAzure(imagen.buffer, imagen.originalname)
+      imagenUrl = uploadResult.url
+      imagenFileName = uploadResult.fileName
+    }
+
     const result = await pool.query(
       `UPDATE productos 
        SET nombre = $1, descripcion = $2, precio = $3, imagen = $4, categoria_id = $5
        WHERE id = $6
        RETURNING *`,
-      [nombre, descripcion, precio, imagen, categoria_id, req.params.id]
+      [nombre, descripcion, precio, imagenUrl, categoria_id, req.params.id]
     )
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Producto no encontrado' })
-    }
 
     // Obtener el producto actualizado con su categoría
     const productoActualizado = await pool.query(`
@@ -124,14 +179,28 @@ router.put('/productos/:id', verificarAdmin, async (req, res) => {
 // ✅ Eliminar un producto
 router.delete('/productos/:id', verificarAdmin, async (req, res) => {
   try {
+    // Obtener la imagen del producto antes de eliminarlo
+    const producto = await pool.query(
+      'SELECT imagen FROM productos WHERE id = $1',
+      [req.params.id]
+    )
+
+    if (producto.rows.length === 0) {
+      return res.status(404).json({ error: 'Producto no encontrado' })
+    }
+
+    // Eliminar la imagen de Azure si existe
+    if (producto.rows[0].imagen) {
+      const fileName = extractFileNameFromUrl(producto.rows[0].imagen)
+      if (fileName) {
+        await deleteImageFromAzure(fileName)
+      }
+    }
+
     const result = await pool.query(
       'DELETE FROM productos WHERE id = $1 RETURNING id',
       [req.params.id]
     )
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Producto no encontrado' })
-    }
 
     res.json({ message: 'Producto eliminado correctamente' })
   } catch (error) {
