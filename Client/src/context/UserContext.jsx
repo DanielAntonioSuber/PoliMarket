@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import { API_URL } from '../config'
 
 const UserContext = createContext()
 
@@ -16,7 +17,7 @@ export function UserProvider({ children }) {
 
   async function login({ email, password }) {
     try {
-      const res = await fetch('http://localhost:3001/api/users/login', {
+      const res = await fetch(`${API_URL}/api/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })

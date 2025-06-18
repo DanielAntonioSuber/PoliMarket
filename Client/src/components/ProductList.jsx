@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ProductForm from './ProductForm';
+import { API_URL } from '../config'
 
 const ProductList = () => {
     const [productos, setProductos] = useState([]);
@@ -18,7 +19,7 @@ const ProductList = () => {
             setLoading(true);
             setError(null);
             console.log('Cargando productos...');
-            const response = await axios.get('/api/productos');
+            const response = await axios.get(`${API_URL}/api/productos`);
             console.log('Productos cargados:', response.data);
             setProductos(response.data);
         } catch (error) {
@@ -39,10 +40,10 @@ const ProductList = () => {
 
             if (editingProduct) {
                 console.log('Actualizando producto:', productData);
-                await axios.put(`/api/productos/${editingProduct.id}`, productData);
+                await axios.put(`${API_URL}/api/productos/${editingProduct.id}`, productData);
             } else {
                 console.log('Creando nuevo producto:', productData);
-                await axios.post('/api/productos', productData);
+                await axios.post(`${API_URL}/api/productos`, productData);
             }
             setShowForm(false);
             setEditingProduct(null);
@@ -62,7 +63,7 @@ const ProductList = () => {
     const handleDelete = async (id) => {
         if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
             try {
-                await axios.delete(`/api/productos/${id}`);
+                await axios.delete(`${API_URL}/api/productos/${id}`);
                 await loadProductos(); // Recargar productos después de eliminar
             } catch (error) {
                 console.error('Error al eliminar producto:', error);

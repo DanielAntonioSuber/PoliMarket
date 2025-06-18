@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_URL } from '../config'
 
 const ProductForm = ({ onSubmit, initialData = {} }) => {
     const [formData, setFormData] = useState({
@@ -24,16 +25,16 @@ const ProductForm = ({ onSubmit, initialData = {} }) => {
                 setError(null);
 
                 // Cargar categorías
-                const categoriasResponse = await axios.get('/api/productos/categorias');
+                const categoriasResponse = await axios.get(`${API_URL}/api/productos/categorias`);
                 setCategorias(categoriasResponse.data);
 
                 // Cargar colores
-                const coloresResponse = await axios.get('/api/productos/colores');
+                const coloresResponse = await axios.get(`${API_URL}/api/productos/colores`);
                 setColores(coloresResponse.data);
 
                 // Si hay datos iniciales, cargar el producto completo
                 if (initialData.id) {
-                    const productoResponse = await axios.get(`/api/productos/${initialData.id}`);
+                    const productoResponse = await axios.get(`${API_URL}/api/productos/${initialData.id}`);
                     const productoData = productoResponse.data;
                     
                     setFormData({

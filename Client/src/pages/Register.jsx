@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { API_URL } from '../config'
 
 function Register() {
   const navigate = useNavigate()
@@ -102,7 +103,7 @@ function Register() {
     const fecha_nacimiento = `${año}-${mes.toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`
 
     try {
-      const res = await fetch('http://localhost:3001/api/users/register', {
+      const res = await fetch(`${API_URL}/api/users/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

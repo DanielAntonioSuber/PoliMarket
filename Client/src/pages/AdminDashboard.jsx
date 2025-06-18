@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useUser } from '../context/UserContext'
 import { useNavigate } from 'react-router-dom'
+import { API_URL } from '../config'
 
 function AdminDashboard() {
   const { usuario, esAdmin, cargando } = useUser()
@@ -40,7 +41,7 @@ function AdminDashboard() {
     const fetchData = async () => {
       try {
         // Obtener órdenes
-        const resOrdenes = await fetch('http://localhost:3001/api/admin/ordenes', {
+        const resOrdenes = await fetch(`${API_URL}/api/admin/ordenes`, {
           headers: { rol: usuario.rol }
         })
         const dataOrdenes = await resOrdenes.json()
@@ -49,21 +50,21 @@ function AdminDashboard() {
         }
 
         // Obtener productos
-        const resProductos = await fetch('http://localhost:3001/api/productos')
+        const resProductos = await fetch(`${API_URL}/api/productos`)
         const dataProductos = await resProductos.json()
         if (resProductos.ok) {
           setProductos(dataProductos)
         }
 
         // Obtener categorías
-        const resCategorias = await fetch('http://localhost:3001/api/productos/categorias')
+        const resCategorias = await fetch(`${API_URL}/api/productos/categorias`)
         const dataCategorias = await resCategorias.json()
         if (resCategorias.ok) {
           setCategorias(dataCategorias)
         }
 
         // Obtener colores
-        const resColores = await fetch('http://localhost:3001/api/productos/colores')
+        const resColores = await fetch(`${API_URL}/api/productos/colores`)
         const dataColores = await resColores.json()
         if (resColores.ok) {
           setColores(dataColores)
@@ -83,8 +84,8 @@ function AdminDashboard() {
     setMensaje('')
     try {
       const url = editandoId 
-        ? `http://localhost:3001/api/admin/productos/${editandoId}`
-        : 'http://localhost:3001/api/admin/productos'
+        ? `${API_URL}/api/admin/productos/${editandoId}`
+        : `${API_URL}/api/admin/productos`
       
       // Crear FormData para enviar archivos
       const formData = new FormData()
@@ -114,7 +115,7 @@ function AdminDashboard() {
       if (res.ok) {
         setMensaje(`✅ Producto ${editandoId ? 'actualizado' : 'agregado'} con éxito`)
         // Actualizar lista de productos
-        const resProductos = await fetch('http://localhost:3001/api/productos')
+        const resProductos = await fetch(`${API_URL}/api/productos`)
         const dataProductos = await resProductos.json()
         setProductos(dataProductos)
         
@@ -193,7 +194,7 @@ function AdminDashboard() {
     }
 
     try {
-      const res = await fetch(`http://localhost:3001/api/admin/productos/${id}`, {
+      const res = await fetch(`${API_URL}/api/admin/productos/${id}`, {
         method: 'DELETE',
         headers: { 
           'Content-Type': 'application/json',

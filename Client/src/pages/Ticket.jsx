@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaCheckCircle, FaShoppingBag, FaHome } from 'react-icons/fa';
+import { API_URL } from '../config'
 
 const Ticket = () => {
   const { id } = useParams();
@@ -13,7 +14,7 @@ const Ticket = () => {
   useEffect(() => {
     const fetchOrden = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/api/ordenes/${id}`);
+        const response = await axios.get(`${API_URL}/api/ordenes/${id}`);
         setOrden(response.data);
         setLoading(false);
       } catch (error) {

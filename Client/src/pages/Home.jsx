@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import ProductCard from '../components/ProductCard'
 import { useCart } from '../context/CartContext'
 import { useLocation } from 'react-router-dom'
+import { API_URL } from '../config'
 
 function Home() {
   const { carrito } = useCart()
@@ -17,7 +18,7 @@ function Home() {
     setProductos([]) // Resetear productos a array vacío
 
     try {
-      const res = await fetch('http://localhost:3001/api/productos')
+      const res = await fetch(`${API_URL}/api/productos`)
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`)
       }
@@ -46,12 +47,11 @@ function Home() {
     setProductos([]) // Resetear productos a array vacío
 
     try {
-      const res = await fetch(`http://localhost:3001/api/productos/buscar?q=${encodeURIComponent(termino)}`)
+      const res = await fetch(`${API_URL}/api/productos/buscar?q=${encodeURIComponent(termino)}`)
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`)
       }
       const data = await res.json()
-      
       // Asegurarse de que data sea un array
       if (Array.isArray(data)) {
         setProductos(data)

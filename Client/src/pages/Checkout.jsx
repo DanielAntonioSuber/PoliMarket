@@ -351,7 +351,7 @@ function Checkout() {
                   onChange={handleChange}
                   required
                   maxLength="2"
-                  style={styles.input}
+                  style={styles.inputFecha}
                 />
               </div>
               <div style={styles.inputGroup}>
@@ -363,7 +363,7 @@ function Checkout() {
                   onChange={handleChange}
                   required
                   maxLength="4"
-                  style={styles.input}
+                  style={styles.inputFecha}
                 />
               </div>
             </div>
@@ -403,7 +403,8 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#f8f9fa',
-    padding: '20px'
+    padding: '40px 10px',
+    boxSizing: 'border-box',
   },
   card: {
     backgroundColor: '#fff',
@@ -412,7 +413,11 @@ const styles = {
     boxShadow: '0 4px 15px rgba(139, 0, 0, 0.1)',
     width: '100%',
     maxWidth: '600px',
-    border: '2px solid #8B0000'
+    border: '2px solid #8B0000',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    boxSizing: 'border-box',
   },
   titulo: {
     fontSize: '2.5em',
@@ -449,7 +454,13 @@ const styles = {
     padding: '20px',
     borderRadius: '10px',
     border: '1px solid #e0e0e0',
-    width: '100%'
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    boxSizing: 'border-box',
+    maxWidth: '450px',
+    margin: '0 auto',
   },
   seccionTitulo: {
     color: '#8B0000',
@@ -460,10 +471,14 @@ const styles = {
   },
   inputGroup: {
     marginBottom: '15px',
-    width: '100%'
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    boxSizing: 'border-box',
   },
   input: {
     width: '100%',
+    maxWidth: '350px',
     padding: '12px',
     borderRadius: '8px',
     border: '2px solid #8B0000',
@@ -472,16 +487,25 @@ const styles = {
     outline: 'none',
     boxSizing: 'border-box',
     textAlign: 'center',
-    '&:focus': {
-      borderColor: '#B22222',
-      boxShadow: '0 0 0 3px rgba(139, 0, 0, 0.2)'
-    }
   },
   fechaVencimiento: {
     display: 'flex',
     gap: '10px',
     width: '100%',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  inputFecha: {
+    width: '80px',
+    minWidth: '60px',
+    padding: '12px',
+    borderRadius: '8px',
+    border: '2px solid #8B0000',
+    fontSize: '16px',
+    transition: 'all 0.3s ease',
+    outline: 'none',
+    boxSizing: 'border-box',
+    textAlign: 'center',
   },
   resumen: {
     backgroundColor: '#f8f9fa',

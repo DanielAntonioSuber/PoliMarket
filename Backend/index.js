@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 require('dotenv').config()
+const path = require('path')
 
 const app = express() // 👈 Primero creamos la instancia de Express
 
@@ -20,6 +21,14 @@ app.use('/api/admin', adminRoutes)
 const productosRoutes = require('./routes/productos')
 app.use('/api/productos', productosRoutes)
 
+// Servir el frontend de producción
+const clientBuildPath = path.join(__dirname, '..', 'Client', 'dist')
+app.use(express.static(clientBuildPath))
+
+// Catch-all para React Router (todas las rutas que no sean API)
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.join(clientBuildPath, 'index.html'))
+})
 
 // Iniciar servidor
 app.listen(PORT, () => {
