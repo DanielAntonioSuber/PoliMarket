@@ -55,6 +55,7 @@ CREATE TABLE public.productos (
     stock INTEGER NOT NULL,
     categoria_id INTEGER REFERENCES public.categorias(id),
     color_id INTEGER REFERENCES public.colores(id),
+    url_imagen TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

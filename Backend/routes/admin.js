@@ -88,7 +88,7 @@ router.post('/productos', verificarAdmin, upload.single('imagen'), async (req, r
       WHERE p.id = $1
     `, [result.rows[0].id])
 
-    res.status(201).json(productoCreado.rows[0])
+    res.status(201).json({ ...productoCreado.rows[0], url_imagen: imagenUrl })
   } catch (error) {
     console.error('Error al agregar producto:', error)
     res.status(500).json({ error: 'Error al guardar el producto' })
@@ -107,7 +107,7 @@ router.get('/productos/:id', verificarAdmin, async (req, res) => {
       return res.status(404).json({ error: 'Producto no encontrado' })
     }
     
-    res.json(result.rows[0])
+    res.json({ ...result.rows[0], url_imagen: result.rows[0].imagen })
   } catch (error) {
     console.error('Error al obtener producto:', error)
     res.status(500).json({ error: 'Error al obtener el producto' })
@@ -169,7 +169,7 @@ router.put('/productos/:id', verificarAdmin, upload.single('imagen'), async (req
       WHERE p.id = $1
     `, [req.params.id])
 
-    res.json(productoActualizado.rows[0])
+    res.json({ ...productoActualizado.rows[0], url_imagen: imagenUrl })
   } catch (error) {
     console.error('Error al actualizar producto:', error)
     res.status(500).json({ error: 'Error al actualizar el producto' })
@@ -213,7 +213,7 @@ router.delete('/productos/:id', verificarAdmin, async (req, res) => {
 router.get('/productos', verificarAdmin, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM productos ORDER BY nombre')
-    res.json(result.rows)
+    res.json(result.rows.map(producto => ({ ...producto, url_imagen: producto.imagen })))
   } catch (error) {
     console.error('Error al obtener productos:', error)
     res.status(500).json({ error: 'Error al obtener productos' })

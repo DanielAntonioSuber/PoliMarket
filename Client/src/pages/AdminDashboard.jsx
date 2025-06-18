@@ -19,7 +19,8 @@ function AdminDashboard() {
     categoria_id: '',
     color_id: '',
     marca: '',
-    stock: ''
+    stock: '',
+    url_imagen: ''
   })
   const [editandoId, setEditandoId] = useState(null)
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
@@ -91,11 +92,10 @@ function AdminDashboard() {
       formData.append('descripcion', form.descripcion || '')
       formData.append('precio', form.precio)
       formData.append('categoria_id', form.categoria_id)
-      
-      // Agregar archivo si se seleccionó uno
-      if (selectedFile) {
-        formData.append('imagen', selectedFile)
-      }
+      formData.append('color_id', form.color_id)
+      formData.append('marca', form.marca)
+      formData.append('stock', form.stock)
+      formData.append('url_imagen', form.url_imagen)
       
       const res = await fetch(url, {
         method: editandoId ? 'PUT' : 'POST',
@@ -157,7 +157,8 @@ function AdminDashboard() {
       categoria_id: '',
       color_id: '',
       marca: '',
-      stock: ''
+      stock: '',
+      url_imagen: ''
     })
     setPreviewUrl(null)
     setSelectedFile(null)
@@ -173,9 +174,10 @@ function AdminDashboard() {
       categoria_id: producto.categoria_id || '',
       color_id: producto.color_id || '',
       marca: producto.marca || '',
-      stock: producto.stock || ''
+      stock: producto.stock || '',
+      url_imagen: producto.url_imagen || ''
     })
-    setPreviewUrl(producto.imagen || null)
+    setPreviewUrl(producto.url_imagen || null)
     setSelectedFile(null)
     setEditandoId(producto.id)
     setMostrarFormulario(true)
@@ -249,7 +251,8 @@ function AdminDashboard() {
                   categoria_id: '',
                   color_id: '',
                   marca: '',
-                  stock: ''
+                  stock: '',
+                  url_imagen: ''
                 })
                 setSelectedFile(null)
                 setPreviewUrl(null)
@@ -281,9 +284,9 @@ function AdminDashboard() {
                 <tr key={p.id}>
                   <td style={styles.td}>{p.id}</td>
                   <td style={styles.td}>
-                    {p.imagen && (
+                    {p.url_imagen && (
                       <img 
-                        src={p.imagen} 
+                        src={p.url_imagen} 
                         alt={p.nombre} 
                         style={styles.imagenMiniatura}
                         onError={(e) => {
@@ -335,7 +338,8 @@ function AdminDashboard() {
                 categoria_id: '',
                 color_id: '',
                 marca: '',
-                stock: ''
+                stock: '',
+                url_imagen: ''
               })
               setSelectedFile(null)
               setPreviewUrl(null)
@@ -405,21 +409,13 @@ function AdminDashboard() {
                     </option>
                   ))}
                 </select>
-                <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-                  <input
-                    type="file"
-                    accept="image/jpeg"
-                    onChange={handleImageChange}
-                    style={styles.inputFile}
-                  />
-                  {previewUrl && (
-                    <img 
-                      src={previewUrl} 
-                      alt="Vista previa" 
-                      style={styles.previewImagen}
-                    />
-                  )}
-                </div>
+                <input
+                  type="text"
+                  placeholder="URL de la imagen"
+                  value={form.url_imagen}
+                  onChange={e => setForm({ ...form, url_imagen: e.target.value })}
+                  style={styles.input}
+                />
               </div>
               <div style={styles.botonesFormulario}>
                 <button
