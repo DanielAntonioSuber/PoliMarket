@@ -484,7 +484,6 @@ function AdminDashboard() {
               setSelectedFile(null)
               setPreviewUrl(null)
             }}
-            className="inline-flex items-center px-6 py-3 border-2 border-[#8B0000] text-[#8B0000] rounded-lg hover:bg-[#8B0000] hover:text-white transition-all duration-200 font-bold text-lg shadow-lg hover:shadow-xl"
           >
             ➕ Agregar Nuevo Producto
           </button>
