@@ -21,6 +21,7 @@ function Home() {
   const location = useLocation()
   const navigate = useNavigate()
   const [busqueda, setBusqueda] = useState('')
+  const [busquedaTexto, setBusquedaTexto] = useState('')
 
   // Obtener productos, colores y categorías
   const obtenerProductos = async () => {
@@ -62,6 +63,12 @@ function Home() {
     obtenerCategorias()
   }, [])
 
+  useEffect(() => {
+    const query = new URLSearchParams(location.search)
+    const q = query.get('q') || ''
+    setBusquedaTexto(q)
+  }, [location.search])
+
   // Filtrado de productos en frontend
   const productosFiltrados = productos.filter(p => {
     const { precioMin, precioMax, color, categoria } = filtros
@@ -70,6 +77,10 @@ function Home() {
     if (precioMax && Number(p.precio) > Number(precioMax)) ok = false
     if (color && String(p.color_id) !== String(color)) ok = false
     if (categoria && String(p.categoria_id) !== String(categoria)) ok = false
+    if (busquedaTexto && !(
+      p.nombre.toLowerCase().includes(busquedaTexto.toLowerCase()) ||
+      (p.descripcion && p.descripcion.toLowerCase().includes(busquedaTexto.toLowerCase()))
+    )) ok = false
     return ok
   })
 
@@ -77,7 +88,20 @@ function Home() {
   if (cargando) {
     return (
       <div style={styles.contenedor}>
-        <h1 style={styles.titulo}>Bienvenido a PoliMarket 🛍️</h1>
+        <h1 style={{
+          color: '#8B0000',
+          fontSize: '3.2rem',
+          fontWeight: 'bolder',
+          marginBottom: '48px',
+          textAlign: 'center',
+          textTransform: 'uppercase',
+          textShadow: '2px 2px 12px rgba(139, 0, 0, 0.25)',
+          width: '100%',
+          letterSpacing: '4px',
+          fontFamily: 'Montserrat, Arial, sans-serif',
+          padding: '48px 0 28px 0',
+          lineHeight: 1.1
+        }}>Bienvenido a PoliMarket 🛍️</h1>
         <p>Cargando productos...</p>
       </div>
     )
@@ -86,7 +110,20 @@ function Home() {
   if (error) {
     return (
       <div style={styles.contenedor}>
-        <h1 style={styles.titulo}>Bienvenido a PoliMarket 🛍️</h1>
+        <h1 style={{
+          color: '#8B0000',
+          fontSize: '3.2rem',
+          fontWeight: 'bolder',
+          marginBottom: '48px',
+          textAlign: 'center',
+          textTransform: 'uppercase',
+          textShadow: '2px 2px 12px rgba(139, 0, 0, 0.25)',
+          width: '100%',
+          letterSpacing: '4px',
+          fontFamily: 'Montserrat, Arial, sans-serif',
+          padding: '48px 0 28px 0',
+          lineHeight: 1.1
+        }}>Bienvenido a PoliMarket 🛍️</h1>
         <p style={{ color: 'red' }}>{error}</p>
       </div>
     )
@@ -94,7 +131,22 @@ function Home() {
 
   return (
     <div style={styles.contenedor}>
-      <h1 style={styles.titulo}>Bienvenido a PoliMarket 🛍️</h1>
+      <h1 style={{
+        color: '#8B0000',
+        fontSize: '3.2rem',
+        fontWeight: 'bolder',
+        marginBottom: '48px',
+        textAlign: 'center',
+        textTransform: 'uppercase',
+        textShadow: '2px 2px 12px rgba(139, 0, 0, 0.25)',
+        width: '100%',
+        letterSpacing: '4px',
+        fontFamily: 'Montserrat, Arial, sans-serif',
+        padding: '48px 0 28px 0',
+        lineHeight: 1.1
+      }}>
+        Bienvenido a PoliMarket 🛍️
+      </h1>
       {/* Filtros */}
       <div style={{
         display: 'flex',

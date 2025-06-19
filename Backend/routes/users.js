@@ -58,8 +58,10 @@ router.post('/login', async (req, res) => {
       usuario: {
         id: usuario.id,
         nombre: usuario.nombre,
+        apellido: usuario.apellido,
+        fecha_nacimiento: usuario.fecha_nacimiento,
         email: usuario.email,
-        rol: usuario.rol  // ✅ se incluye el rol
+        rol: usuario.rol
       }
     })
   } catch (err) {
@@ -67,5 +69,19 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Error del servidor' })
   }
 })
+
+// Obtener datos del usuario por id (para perfil)
+router.get('/me', async (req, res) => {
+  const { id } = req.query;
+  if (!id) return res.status(400).json({ error: 'Falta id de usuario' });
+
+  try {
+    const result = await pool.query('SELECT id, nombre, apellido, fecha_nacimiento, email, rol FROM usuarios WHERE id = $1', [id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Usuario no encontrado' });
+    res.json({ usuario: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al consultar usuario' });
+  }
+});
 
 module.exports = router

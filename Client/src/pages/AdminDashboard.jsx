@@ -267,17 +267,29 @@ function AdminDashboard() {
 
   return (
     <div style={styles.contenedor}>
-      <h1 style={styles.titulo}>
-        <span style={styles.tituloPoli}>Poli</span>
-        <span style={styles.tituloMarket}>Market</span>
+      <h1 style={{
+        ...styles.titulo,
+        fontFamily: 'Merriweather, serif',
+        fontSize: '2.8rem',
+        letterSpacing: '2px',
+        fontWeight: 700
+      }}>
+        <span style={{...styles.tituloPoli, fontFamily: 'Merriweather, serif', fontSize: '2.8rem'}}>Poli</span>
+        <span style={{...styles.tituloMarket, fontFamily: 'Merriweather, serif', fontSize: '2.8rem'}}>Market</span>
         <span style={styles.tituloAdmin}> - Panel de Administración</span>
       </h1>
-      <p style={styles.bienvenida}>Bienvenido, {usuario?.nombre}</p>
+      <p style={{
+        ...styles.bienvenida,
+        fontFamily: 'Merriweather, serif',
+        fontSize: '2rem',
+        fontWeight: 700,
+        marginBottom: '30px'
+      }}>Bienvenido, {usuario?.nombre}</p>
 
       {/* Sección de Productos */}
       <div style={styles.seccion}>
         <div style={styles.header}>
-          <h2>📦 Productos</h2>
+          <h2 style={{ fontSize: '2.1rem', margin: 0 }}>📦 Productos</h2>
           <button 
             onClick={() => {
               setMostrarFormulario(!mostrarFormulario)
@@ -678,36 +690,34 @@ const styles = {
     backgroundColor: 'transparent',
     color: '#8B0000',
     border: '2px solid #8B0000',
-    padding: '14px 28px',
+    padding: '12px 28px',
     borderRadius: '6px',
     cursor: 'pointer',
     marginRight: '8px',
     fontWeight: 'bold',
     transition: 'all 0.3s ease',
     display: 'inline-block',
-    fontSize: '1.2rem',
+    fontSize: '1.1rem',
     fontFamily: 'Montserrat, Arial, sans-serif',
-    ':hover': {
-      backgroundColor: '#8B0000',
-      color: 'white'
-    }
+    minWidth: '120px',
+    textAlign: 'center',
+    boxSizing: 'border-box',
   },
   botonEliminar: {
     backgroundColor: 'transparent',
     color: '#dc2626',
     border: '2px solid #dc2626',
-    padding: '14px 28px',
+    padding: '12px 28px',
     borderRadius: '6px',
     cursor: 'pointer',
     fontWeight: 'bold',
     transition: 'all 0.3s ease',
     display: 'inline-block',
-    fontSize: '1.2rem',
+    fontSize: '1.1rem',
     fontFamily: 'Montserrat, Arial, sans-serif',
-    ':hover': {
-      backgroundColor: '#dc2626',
-      color: 'white'
-    }
+    minWidth: '120px',
+    textAlign: 'center',
+    boxSizing: 'border-box',
   },
   botonAgregar: {
     backgroundColor: 'transparent',
@@ -892,10 +902,11 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: '25px',
-    padding: '15px',
+    padding: '32px',
     backgroundColor: '#8B0000',
-    borderRadius: '10px',
-    color: '#fff'
+    borderRadius: '18px',
+    color: '#fff',
+    minHeight: '80px',
   },
   tituloPoli: {
     color: '#8B0000',

@@ -41,7 +41,9 @@ function Navbar() {
         {usuario ? (
           <>
             {usuario.rol === 'admin' && <Link to="/admin" style={styles.link}>Dashboard</Link>}
-            <span style={styles.nombre}>Hola, {usuario.nombre}</span>
+            <span style={styles.nombre} onClick={() => navigate('/perfil')}>
+              Hola, {usuario.nombre}
+            </span>
             <button onClick={logout} style={styles.logout}>Cerrar sesión</button>
           </>
         ) : (
@@ -57,13 +59,14 @@ function Navbar() {
 
 const styles = {
   nav: {
-    backgroundColor: '#003366', // Azul IPN
-    padding: '15px',
+    backgroundColor: '#003366',
+    padding: '32px 32px',
+    minHeight: '90px',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     color: 'white',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    boxShadow: '0 2px 8px rgba(0,0,0,0.13)',
   },
   logoContainer: {
     display: 'flex',
@@ -71,10 +74,10 @@ const styles = {
     gap: '10px'
   },
   logo: {
-    fontSize: '1.6em',
+    fontSize: '2.1em',
     display: 'flex',
     alignItems: 'center',
-    gap: '2px'
+    gap: '4px'
   },
   logoText: {
     fontWeight: 'bold',
@@ -87,76 +90,69 @@ const styles = {
   ipnBadge: {
     backgroundColor: '#ffd700',
     color: '#003366',
-    padding: '2px 8px',
-    borderRadius: '4px',
-    fontSize: '0.8em',
+    padding: '5px 14px',
+    borderRadius: '7px',
+    fontSize: '1em',
     fontWeight: 'bold'
   },
   links: {
     display: 'flex',
-    gap: '15px',
-    alignItems: 'center'
+    gap: '16px',
+    alignItems: 'center',
+    fontSize: '1.08em',
   },
   link: {
     color: 'white',
     textDecoration: 'none',
     fontWeight: 'bold',
+    fontSize: '1em',
     transition: 'color 0.3s ease',
-    '&:hover': {
-      color: '#ffd700'
-    }
   },
   nombre: {
     fontWeight: 'bold',
-    color: '#ffd700'
+    color: '#ffd700',
+    fontSize: '1em',
+    cursor: 'pointer',
+    position: 'relative',
   },
   logout: {
     backgroundColor: '#ffd700',
     color: '#003366',
     border: 'none',
-    padding: '5px 10px',
+    padding: '7px 14px',
     cursor: 'pointer',
-    borderRadius: '5px',
+    borderRadius: '6px',
     fontWeight: 'bold',
+    fontSize: '1em',
     transition: 'all 0.3s ease',
-    '&:hover': {
-      backgroundColor: '#fff',
-      transform: 'scale(1.05)'
-    }
   },
   searchForm: {
     display: 'flex',
     alignItems: 'center',
-    gap: '5px',
+    gap: '10px',
     flex: '1',
-    maxWidth: '500px',
-    margin: '0 20px'
+    maxWidth: '600px',
+    margin: '0 30px'
   },
   searchInput: {
-    padding: '8px 12px',
-    borderRadius: '4px',
+    padding: '11px 16px',
+    borderRadius: '7px',
     border: 'none',
-    fontSize: '1em',
+    fontSize: '1.08em',
     width: '100%',
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    '&:focus': {
-      outline: '2px solid #ffd700'
-    }
+    backgroundColor: 'rgba(255,255,255,0.96)',
   },
   searchButton: {
-    padding: '8px 12px',
-    borderRadius: '4px',
+    padding: '11px 16px',
+    borderRadius: '7px',
     border: 'none',
     backgroundColor: '#ffd700',
     color: '#003366',
     cursor: 'pointer',
     fontWeight: 'bold',
+    fontSize: '1.08em',
     transition: 'all 0.3s ease',
-    '&:hover': {
-      backgroundColor: '#fff',
-      transform: 'scale(1.05)'
-    }
-  }
+  },
 }
 
 export default Navbar
