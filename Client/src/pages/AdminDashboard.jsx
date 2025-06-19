@@ -26,6 +26,12 @@ function AdminDashboard() {
   const [editandoId, setEditandoId] = useState(null)
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [selectedFile, setSelectedFile] = useState(null)
+  const [filtros, setFiltros] = useState({
+    precioMin: '',
+    precioMax: '',
+    color: '',
+    categoria: ''
+  })
 
   const colorMap = {
     Rojo: '#FF0000',
@@ -240,6 +246,17 @@ function AdminDashboard() {
     }))
   }
 
+  // Filtrado de productos en frontend
+  const productosFiltrados = productos.filter(p => {
+    const { precioMin, precioMax, color, categoria } = filtros
+    let ok = true
+    if (precioMin && Number(p.precio) < Number(precioMin)) ok = false
+    if (precioMax && Number(p.precio) > Number(precioMax)) ok = false
+    if (color && String(p.color_id) !== String(color)) ok = false
+    if (categoria && String(p.categoria_id) !== String(categoria)) ok = false
+    return ok
+  })
+
   if (cargando) {
     return <div style={{ padding: '20px' }}>Cargando...</div>
   }
@@ -286,6 +303,87 @@ function AdminDashboard() {
           </button>
         </div>
 
+        {/* Filtros de productos */}
+        <div style={{
+          display: 'flex',
+          gap: 16,
+          flexWrap: 'wrap',
+          marginBottom: 18,
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <div style={{
+            background: '#f3f4f6',
+            boxShadow: '0 2px 8px rgba(139,0,0,0.08)',
+            border: '2px solid #8B0000',
+            borderRadius: 10,
+            padding: '10px 14px',
+            minWidth: 110,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+          }}>
+            <label style={{fontWeight: 'bold', fontSize: '1rem', marginBottom: 3}}>Precio mín:<br/>
+              <input type="number" min="0" value={filtros.precioMin} onChange={e => setFiltros(f => ({...f, precioMin: e.target.value}))} style={{width: 70, fontSize: '1rem', padding: 5, borderRadius: 6, border: '1.5px solid #8B0000', marginTop: 2}} />
+            </label>
+          </div>
+          <div style={{
+            background: '#f3f4f6',
+            boxShadow: '0 2px 8px rgba(139,0,0,0.08)',
+            border: '2px solid #8B0000',
+            borderRadius: 10,
+            padding: '10px 14px',
+            minWidth: 110,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+          }}>
+            <label style={{fontWeight: 'bold', fontSize: '1rem', marginBottom: 3}}>Precio máx:<br/>
+              <input type="number" min="0" value={filtros.precioMax} onChange={e => setFiltros(f => ({...f, precioMax: e.target.value}))} style={{width: 70, fontSize: '1rem', padding: 5, borderRadius: 6, border: '1.5px solid #8B0000', marginTop: 2}} />
+            </label>
+          </div>
+          <div style={{
+            background: '#f3f4f6',
+            boxShadow: '0 2px 8px rgba(139,0,0,0.08)',
+            border: '2px solid #8B0000',
+            borderRadius: 10,
+            padding: '10px 14px',
+            minWidth: 110,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+          }}>
+            <label style={{fontWeight: 'bold', fontSize: '1rem', marginBottom: 3}}>Color:<br/>
+              <select value={filtros.color} onChange={e => setFiltros(f => ({...f, color: e.target.value}))} style={{width: 80, fontSize: '1rem', padding: 5, borderRadius: 6, border: '1.5px solid #8B0000', marginTop: 2}}>
+                <option value="">Todos</option>
+                {colores.map(c => (
+                  <option key={c.id} value={c.id}>{c.nombre}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div style={{
+            background: '#f3f4f6',
+            boxShadow: '0 2px 8px rgba(139,0,0,0.08)',
+            border: '2px solid #8B0000',
+            borderRadius: 10,
+            padding: '10px 14px',
+            minWidth: 110,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+          }}>
+            <label style={{fontWeight: 'bold', fontSize: '1rem', marginBottom: 3}}>Categoría:<br/>
+              <select value={filtros.categoria} onChange={e => setFiltros(f => ({...f, categoria: e.target.value}))} style={{width: 80, fontSize: '1rem', padding: 5, borderRadius: 6, border: '1.5px solid #8B0000', marginTop: 2}}>
+                <option value="">Todas</option>
+                {categorias.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+        </div>
+
         {/* Tabla de Productos */}
         <div style={styles.tabla}>
           <table>
@@ -302,7 +400,7 @@ function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {productos.map(p => (
+              {productosFiltrados.map(p => (
                 <tr key={p.id}>
                   <td style={styles.td}>{p.id}</td>
                   <td style={styles.td}>
