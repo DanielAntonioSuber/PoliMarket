@@ -73,7 +73,8 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#f8f9fa',
-    padding: '20px'
+    padding: '20px',
+    fontFamily: 'Roboto, Arial, sans-serif',
   },
   card: {
     backgroundColor: '#fff',
@@ -88,14 +89,16 @@ const styles = {
     alignItems: 'center'
   },
   titulo: {
-    fontSize: '2.5em',
-    marginBottom: '30px',
+    color: '#8B0000',
+    fontSize: '2rem',
+    fontWeight: 'bolder',
+    marginBottom: '24px',
     textAlign: 'center',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '5px',
-    width: '100%'
+    textTransform: 'uppercase',
+    textShadow: '2px 2px 8px rgba(139, 0, 0, 0.3)',
+    width: '100%',
+    letterSpacing: '2px',
+    fontFamily: 'Montserrat, Arial, sans-serif',
   },
   tituloPoli: {
     color: '#8B0000',
@@ -139,16 +142,17 @@ const styles = {
     }
   },
   button: {
-    backgroundColor: '#8B0000',
-    color: '#fff',
-    padding: '15px',
-    borderRadius: '8px',
-    border: 'none',
-    fontSize: '16px',
+    fontSize: '1.2rem',
+    padding: '14px 28px',
     fontWeight: 'bold',
+    fontFamily: 'Montserrat, Arial, sans-serif',
+    borderRadius: '8px',
+    backgroundColor: '#8B0000',
+    color: 'white',
+    border: 'none',
     cursor: 'pointer',
-    transition: 'all 0.3s ease',
-    marginTop: '10px',
+    margin: '10px 0',
+    transition: 'all 0.2s',
     width: '100%',
     '&:hover': {
       backgroundColor: '#B22222',

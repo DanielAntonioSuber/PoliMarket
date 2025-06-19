@@ -120,13 +120,24 @@ function Carrito() {
 const styles = {
   contenedor: {
     padding: '20px',
-    maxWidth: '1200px',
-    margin: '0 auto'
+    maxWidth: '900px',
+    margin: '0 auto',
+    fontSize: '1.25rem',
+    fontWeight: 'bold',
+    color: '#8B0000',
+    fontFamily: 'Roboto, Arial, sans-serif',
   },
   titulo: {
-    color: '#003366',
-    marginBottom: '30px',
-    textAlign: 'center'
+    color: '#8B0000',
+    fontSize: '2rem',
+    fontWeight: 'bolder',
+    marginBottom: '24px',
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    textShadow: '2px 2px 8px rgba(139, 0, 0, 0.3)',
+    width: '100%',
+    letterSpacing: '2px',
+    fontFamily: 'Montserrat, Arial, sans-serif',
   },
   mensaje: {
     textAlign: 'center',
@@ -282,7 +293,20 @@ const styles = {
       backgroundColor: '#004080',
       transform: 'scale(1.02)'
     }
-  }
+  },
+  boton: {
+    fontSize: '1.2rem',
+    padding: '14px 28px',
+    fontWeight: 'bold',
+    fontFamily: 'Montserrat, Arial, sans-serif',
+    borderRadius: '8px',
+    backgroundColor: '#8B0000',
+    color: 'white',
+    border: 'none',
+    cursor: 'pointer',
+    margin: '10px 0',
+    transition: 'all 0.2s',
+  },
 }
 
 export default Carrito 

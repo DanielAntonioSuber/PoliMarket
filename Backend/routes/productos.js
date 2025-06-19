@@ -152,6 +152,29 @@ router.post('/', async (req, res) => {
     }
 });
 
+// Búsqueda solo por nombre
+router.get('/buscar', async (req, res) => {
+    const { q } = req.query;
+    if (!q) {
+        return res.json([]);
+    }
+
+    try {
+        const result = await pool.query(`
+            SELECT p.*, c.nombre as categoria_nombre, co.nombre as color_nombre
+            FROM productos p
+            LEFT JOIN categorias c ON p.categoria_id = c.id
+            LEFT JOIN colores co ON p.color_id = co.id
+            WHERE p.nombre ILIKE $1
+            ORDER BY p.id DESC
+        `, [`%${q}%`]);
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error al buscar productos:', error);
+        res.status(500).json({ error: 'Error al buscar productos' });
+    }
+});
+
 // Obtener un producto específico
 router.get('/:id', async (req, res) => {
     try {
@@ -236,29 +259,6 @@ router.get('/marcas', async (req, res) => {
     } catch (error) {
         console.error('Error al obtener marcas:', error);
         res.status(500).json({ error: 'Error al obtener marcas' });
-    }
-});
-
-// Búsqueda por nombre o descripción
-router.get('/buscar', async (req, res) => {
-    const { q } = req.query;
-    if (!q) {
-        return res.json([]);
-    }
-
-    try {
-        const result = await pool.query(`
-            SELECT p.*, c.nombre as categoria_nombre, co.nombre as color_nombre
-            FROM productos p
-            LEFT JOIN categorias c ON p.categoria_id = c.id
-            LEFT JOIN colores co ON p.color_id = co.id
-            WHERE p.nombre ILIKE $1 OR p.descripcion ILIKE $1
-            ORDER BY p.id DESC
-        `, [`%${q}%`]);
-        res.json(result.rows);
-    } catch (error) {
-        console.error('Error al buscar productos:', error);
-        res.status(500).json({ error: 'Error al buscar productos' });
     }
 });
 

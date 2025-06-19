@@ -108,7 +108,8 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#f8f9fa',
-    padding: '20px'
+    padding: '20px',
+    fontFamily: 'Roboto, Arial, sans-serif',
   },
   card: {
     backgroundColor: '#fff',
@@ -129,13 +130,16 @@ const styles = {
     marginBottom: '20px'
   },
   titulo: {
-    fontSize: '2.5em',
-    marginBottom: '20px',
+    color: '#8B0000',
+    fontSize: '2rem',
+    fontWeight: 'bolder',
+    marginBottom: '24px',
     textAlign: 'center',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '5px'
+    textTransform: 'uppercase',
+    textShadow: '2px 2px 8px rgba(139, 0, 0, 0.3)',
+    width: '100%',
+    letterSpacing: '2px',
+    fontFamily: 'Montserrat, Arial, sans-serif',
   },
   seccion: {
     backgroundColor: '#f8f9fa',
@@ -199,18 +203,17 @@ const styles = {
     marginTop: '30px'
   },
   boton: {
-    backgroundColor: '#8B0000',
-    color: '#fff',
-    border: 'none',
-    padding: '12px 25px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '1em',
+    fontSize: '1.2rem',
+    padding: '14px 28px',
     fontWeight: 'bold',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    transition: 'all 0.3s ease',
+    fontFamily: 'Montserrat, Arial, sans-serif',
+    borderRadius: '8px',
+    backgroundColor: '#8B0000',
+    color: 'white',
+    border: 'none',
+    cursor: 'pointer',
+    margin: '10px 0',
+    transition: 'all 0.2s',
     '&:hover': {
       backgroundColor: '#B22222',
       transform: 'translateY(-2px)',

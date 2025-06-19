@@ -397,6 +397,27 @@ function Checkout() {
 }
 
 const styles = {
+  contenedor: {
+    padding: '20px',
+    maxWidth: '900px',
+    margin: '0 auto',
+    fontSize: '1.25rem',
+    fontWeight: 'bold',
+    color: '#8B0000',
+    fontFamily: 'Roboto, Arial, sans-serif',
+  },
+  titulo: {
+    color: '#8B0000',
+    fontSize: '2rem',
+    fontWeight: 'bolder',
+    marginBottom: '24px',
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    textShadow: '2px 2px 8px rgba(139, 0, 0, 0.3)',
+    width: '100%',
+    letterSpacing: '2px',
+    fontFamily: 'Montserrat, Arial, sans-serif',
+  },
   container: {
     minHeight: '100vh',
     display: 'flex',
@@ -418,15 +439,6 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     boxSizing: 'border-box',
-  },
-  titulo: {
-    fontSize: '2.5em',
-    marginBottom: '30px',
-    textAlign: 'center',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '5px'
   },
   tituloPoli: {
     color: '#8B0000',
@@ -641,7 +653,20 @@ const styles = {
     justifyContent: 'space-between',
     padding: '10px 0',
     borderBottom: '1px solid #e0e0e0'
-  }
+  },
+  boton: {
+    fontSize: '1.2rem',
+    padding: '14px 28px',
+    fontWeight: 'bold',
+    fontFamily: 'Montserrat, Arial, sans-serif',
+    borderRadius: '8px',
+    backgroundColor: '#8B0000',
+    color: 'white',
+    border: 'none',
+    cursor: 'pointer',
+    margin: '10px 0',
+    transition: 'all 0.2s',
+  },
 }
 
 export default Checkout 

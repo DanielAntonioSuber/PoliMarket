@@ -66,16 +66,22 @@ function ProductCard({ producto }) {
 
 const styles = {
   card: {
-    backgroundColor: 'white',
-    borderRadius: '10px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    overflow: 'hidden',
+    backgroundColor: '#fff',
+    border: '3px solid #8B0000',
+    borderRadius: '12px',
+    boxShadow: '0 4px 16px rgba(139,0,0,0.10)',
+    padding: '18px',
+    margin: '16px',
+    transition: 'transform 0.2s, box-shadow 0.2s',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
     width: '300px',
     position: 'relative',
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+    overflow: 'hidden',
     '&:hover': {
-      transform: 'translateY(-5px)',
-      boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+      transform: 'translateY(-5px) scale(1.03)',
+      boxShadow: '0 8px 24px rgba(139,0,0,0.18)'
     }
   },
   imagen: {

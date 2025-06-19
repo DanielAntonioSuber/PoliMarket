@@ -132,7 +132,7 @@ function Register() {
   }
 
   return (
-    <div style={styles.container}>
+    <div style={styles.contenedor}>
       <div style={styles.card}>
         <h2 style={styles.titulo}>
           <span style={styles.tituloPoli}>Poli</span>
@@ -225,7 +225,7 @@ function Register() {
             />
           </div>
 
-          <button type="submit" style={styles.button}>
+          <button type="submit" style={styles.boton}>
             Registrarse
           </button>
 
@@ -245,13 +245,14 @@ function Register() {
 }
 
 const styles = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f8f9fa',
-    padding: '20px'
+  contenedor: {
+    padding: '20px',
+    maxWidth: '600px',
+    margin: '0 auto',
+    fontSize: '1.25rem',
+    fontWeight: 'bold',
+    color: '#8B0000',
+    fontFamily: 'Roboto, Arial, sans-serif',
   },
   card: {
     backgroundColor: '#fff',
@@ -266,14 +267,16 @@ const styles = {
     alignItems: 'center'
   },
   titulo: {
-    fontSize: '2.5em',
-    marginBottom: '30px',
+    color: '#8B0000',
+    fontSize: '2rem',
+    fontWeight: 'bolder',
+    marginBottom: '24px',
     textAlign: 'center',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '5px',
-    width: '100%'
+    textTransform: 'uppercase',
+    textShadow: '2px 2px 8px rgba(139, 0, 0, 0.3)',
+    width: '100%',
+    letterSpacing: '2px',
+    fontFamily: 'Montserrat, Arial, sans-serif',
   },
   tituloPoli: {
     color: '#8B0000',
@@ -321,23 +324,18 @@ const styles = {
       boxShadow: '0 0 0 3px rgba(139, 0, 0, 0.2)'
     }
   },
-  button: {
-    backgroundColor: '#8B0000',
-    color: '#fff',
-    padding: '15px',
-    borderRadius: '8px',
-    border: 'none',
-    fontSize: '16px',
+  boton: {
+    fontSize: '1.2rem',
+    padding: '14px 28px',
     fontWeight: 'bold',
+    fontFamily: 'Montserrat, Arial, sans-serif',
+    borderRadius: '8px',
+    backgroundColor: '#8B0000',
+    color: 'white',
+    border: 'none',
     cursor: 'pointer',
-    transition: 'all 0.3s ease',
-    marginTop: '10px',
-    width: '100%',
-    '&:hover': {
-      backgroundColor: '#B22222',
-      transform: 'translateY(-2px)',
-      boxShadow: '0 4px 8px rgba(139, 0, 0, 0.2)'
-    }
+    margin: '10px 0',
+    transition: 'all 0.2s',
   },
   success: {
     color: '#28a745',
