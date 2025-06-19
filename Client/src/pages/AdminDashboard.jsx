@@ -27,6 +27,23 @@ function AdminDashboard() {
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [selectedFile, setSelectedFile] = useState(null)
 
+  const colorMap = {
+    Rojo: '#FF0000',
+    Azul: '#0000FF',
+    Verde: '#008000',
+    Negro: '#000000',
+    Blanco: '#FFFFFF',
+    Amarillo: '#FFFF00',
+    Naranja: '#FFA500',
+    Morado: '#800080',
+    Rosa: '#FFC0CB',
+    Gris: '#808080',
+    Marrón: '#8B4513',
+    Celeste: '#00BFFF',
+    Violeta: '#EE82EE',
+    // Agrega más si usas otros nombres
+  };
+
   useEffect(() => {
     if (!cargando) {
       if (!usuario) {
@@ -308,7 +325,15 @@ function AdminDashboard() {
                     {categorias.find(c => c.id === p.categoria_id)?.nombre || 'Sin categoría'}
                   </td>
                   <td style={styles.td}>
-                    {colores.find(c => c.id === p.color_id)?.nombre || 'Sin color'}
+                    {(() => {
+                      const colorObj = colores.find(c => String(c.id) === String(p.color_id));
+                      if (!colorObj) return 'Sin color';
+                      return (
+                        <span style={{ color: colorMap[colorObj.nombre] || '#000' }}>
+                          {colorObj.nombre}
+                        </span>
+                      );
+                    })()}
                   </td>
                   <td style={styles.td}>
                     <button

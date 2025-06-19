@@ -8,7 +8,7 @@ ALTER TABLE public.categorias OWNER TO alvaro;
 
 -- Tabla: colores
 CREATE TABLE IF NOT EXISTS public.colores (
-    id SERIAL PRIMARY KEY,
+    color_id SERIAL PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE
 );
 

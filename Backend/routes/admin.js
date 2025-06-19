@@ -55,7 +55,7 @@ router.get('/ordenes', verificarAdmin, async (req, res) => {
 
 // ✅ Agregar nuevo producto con imagen en Azure Blob Storage
 router.post('/productos', verificarAdmin, upload.single('imagen'), async (req, res) => {
-  const { nombre, descripcion, precio, categoria_id } = req.body
+  const { nombre, descripcion, precio, categoria_id, color_id } = req.body
   const imagen = req.file
 
   if (!nombre || !precio || !categoria_id) {
@@ -74,17 +74,18 @@ router.post('/productos', verificarAdmin, upload.single('imagen'), async (req, r
     }
 
     const result = await pool.query(
-      `INSERT INTO productos (nombre, descripcion, precio, url_imagen, categoria_id)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO productos (nombre, descripcion, precio, url_imagen, categoria_id, color_id)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [nombre, descripcion, precio, url_imagen, categoria_id]
+      [nombre, descripcion, precio, url_imagen, categoria_id, color_id]
     )
 
     // Obtener el producto creado con su categoría
     const productoCreado = await pool.query(`
-      SELECT p.*, c.nombre as categoria 
-      FROM productos p 
-      LEFT JOIN categorias c ON p.categoria_id = c.id 
+      SELECT p.*, c.nombre as categoria, co.nombre as color_nombre
+      FROM productos p
+      LEFT JOIN categorias c ON p.categoria_id = c.id
+      LEFT JOIN colores co ON p.color_id = co.id
       WHERE p.id = $1
     `, [result.rows[0].id])
 
@@ -116,7 +117,7 @@ router.get('/productos/:id', verificarAdmin, async (req, res) => {
 
 // ✅ Actualizar un producto con imagen en Azure Blob Storage
 router.put('/productos/:id', verificarAdmin, upload.single('imagen'), async (req, res) => {
-  const { nombre, descripcion, precio, categoria_id } = req.body
+  const { nombre, descripcion, precio, categoria_id, color_id } = req.body
   const imagen = req.file
 
   if (!nombre || !precio || !categoria_id) {
@@ -155,17 +156,18 @@ router.put('/productos/:id', verificarAdmin, upload.single('imagen'), async (req
 
     const result = await pool.query(
       `UPDATE productos 
-       SET nombre = $1, descripcion = $2, precio = $3, url_imagen = $4, categoria_id = $5
-       WHERE id = $6
+       SET nombre = $1, descripcion = $2, precio = $3, url_imagen = $4, categoria_id = $5, color_id = $6
+       WHERE id = $7
        RETURNING *`,
-      [nombre, descripcion, precio, url_imagen, categoria_id, req.params.id]
+      [nombre, descripcion, precio, url_imagen, categoria_id, color_id, req.params.id]
     )
 
     // Obtener el producto actualizado con su categoría
     const productoActualizado = await pool.query(`
-      SELECT p.*, c.nombre as categoria 
-      FROM productos p 
-      LEFT JOIN categorias c ON p.categoria_id = c.id 
+      SELECT p.*, c.nombre as categoria, co.nombre as color_nombre
+      FROM productos p
+      LEFT JOIN categorias c ON p.categoria_id = c.id
+      LEFT JOIN colores co ON p.color_id = co.id
       WHERE p.id = $1
     `, [req.params.id])
 
