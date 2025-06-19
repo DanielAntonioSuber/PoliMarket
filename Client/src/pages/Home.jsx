@@ -10,77 +10,68 @@ function Home() {
   const [productos, setProductos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
+  const [colores, setColores] = useState([])
+  const [categorias, setCategorias] = useState([])
+  const [filtros, setFiltros] = useState({
+    precioMin: '',
+    precioMax: '',
+    color: '',
+    categoria: ''
+  })
   const location = useLocation()
   const navigate = useNavigate()
   const [busqueda, setBusqueda] = useState('')
 
+  // Obtener productos, colores y categorías
   const obtenerProductos = async () => {
     setCargando(true)
     setError('')
-    setProductos([]) // Resetear productos a array vacío
-
+    setProductos([])
     try {
       const res = await fetch(`${API_URL}/api/productos`)
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`)
-      }
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
       const data = await res.json()
-      
-      // Asegurarse de que data sea un array
-      if (Array.isArray(data)) {
-        setProductos(data)
-      } else {
-        console.error('La respuesta no es un array:', data)
-        setProductos([])
-        setError('Error en el formato de los datos')
-      }
+      setProductos(Array.isArray(data) ? data : [])
     } catch (err) {
-      console.error('Error al obtener productos:', err)
       setProductos([])
       setError('No se pudieron cargar los productos')
     } finally {
       setCargando(false)
     }
   }
-
-  const buscarProductos = async (termino) => {
-    setCargando(true)
-    setError('')
-    setProductos([]) // Resetear productos a array vacío
-
+  const obtenerColores = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/productos/buscar?q=${encodeURIComponent(termino)}`)
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`)
-      }
+      const res = await fetch(`${API_URL}/api/productos/colores`)
+      if (!res.ok) return
       const data = await res.json()
-      // Asegurarse de que data sea un array
-      if (Array.isArray(data)) {
-        setProductos(data)
-      } else {
-        console.error('La respuesta no es un array:', data)
-        setProductos([])
-        setError('Error en el formato de los datos')
-      }
-    } catch (err) {
-      console.error('Error al buscar productos:', err)
-      setProductos([])
-      setError('No se pudieron buscar productos')
-    } finally {
-      setCargando(false)
-    }
+      setColores(Array.isArray(data) ? data : [])
+    } catch {}
+  }
+  const obtenerCategorias = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/productos/categorias`)
+      if (!res.ok) return
+      const data = await res.json()
+      setCategorias(Array.isArray(data) ? data : [])
+    } catch {}
   }
 
   useEffect(() => {
-    const query = new URLSearchParams(location.search)
-    const busqueda = query.get('q')
+    obtenerProductos()
+    obtenerColores()
+    obtenerCategorias()
+  }, [])
 
-    if (busqueda) {
-      buscarProductos(busqueda)
-    } else {
-      obtenerProductos()
-    }
-  }, [location.search])
+  // Filtrado de productos en frontend
+  const productosFiltrados = productos.filter(p => {
+    const { precioMin, precioMax, color, categoria } = filtros
+    let ok = true
+    if (precioMin && Number(p.precio) < Number(precioMin)) ok = false
+    if (precioMax && Number(p.precio) > Number(precioMax)) ok = false
+    if (color && String(p.color_id) !== String(color)) ok = false
+    if (categoria && String(p.categoria_id) !== String(categoria)) ok = false
+    return ok
+  })
 
   // Renderizado condicional
   if (cargando) {
@@ -104,9 +95,89 @@ function Home() {
   return (
     <div style={styles.contenedor}>
       <h1 style={styles.titulo}>Bienvenido a PoliMarket 🛍️</h1>
-      {Array.isArray(productos) && productos.length > 0 ? (
+      {/* Filtros */}
+      <div style={{
+        display: 'flex',
+        gap: 16,
+        flexWrap: 'wrap',
+        marginBottom: 24,
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{
+          background: '#f3f4f6',
+          boxShadow: '0 2px 8px rgba(139,0,0,0.08)',
+          border: '2px solid #8B0000',
+          borderRadius: 10,
+          padding: '12px 16px',
+          minWidth: 120,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+        }}>
+          <label style={{fontWeight: 'bold', fontSize: '1.05rem', marginBottom: 4}}>Precio mín:<br/>
+            <input type="number" min="0" value={filtros.precioMin} onChange={e => setFiltros(f => ({...f, precioMin: e.target.value}))} style={{width: 85, fontSize: '1.05rem', padding: 7, borderRadius: 7, border: '1.5px solid #8B0000', marginTop: 3}} />
+          </label>
+        </div>
+        <div style={{
+          background: '#f3f4f6',
+          boxShadow: '0 2px 8px rgba(139,0,0,0.08)',
+          border: '2px solid #8B0000',
+          borderRadius: 10,
+          padding: '12px 16px',
+          minWidth: 120,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+        }}>
+          <label style={{fontWeight: 'bold', fontSize: '1.05rem', marginBottom: 4}}>Precio máx:<br/>
+            <input type="number" min="0" value={filtros.precioMax} onChange={e => setFiltros(f => ({...f, precioMax: e.target.value}))} style={{width: 85, fontSize: '1.05rem', padding: 7, borderRadius: 7, border: '1.5px solid #8B0000', marginTop: 3}} />
+          </label>
+        </div>
+        <div style={{
+          background: '#f3f4f6',
+          boxShadow: '0 2px 8px rgba(139,0,0,0.08)',
+          border: '2px solid #8B0000',
+          borderRadius: 10,
+          padding: '12px 16px',
+          minWidth: 120,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+        }}>
+          <label style={{fontWeight: 'bold', fontSize: '1.05rem', marginBottom: 4}}>Color:<br/>
+            <select value={filtros.color} onChange={e => setFiltros(f => ({...f, color: e.target.value}))} style={{width: 95, fontSize: '1.05rem', padding: 7, borderRadius: 7, border: '1.5px solid #8B0000', marginTop: 3}}>
+              <option value="">Todos</option>
+              {colores.map(c => (
+                <option key={c.id} value={c.id}>{c.nombre}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <div style={{
+          background: '#f3f4f6',
+          boxShadow: '0 2px 8px rgba(139,0,0,0.08)',
+          border: '2px solid #8B0000',
+          borderRadius: 10,
+          padding: '12px 16px',
+          minWidth: 120,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+        }}>
+          <label style={{fontWeight: 'bold', fontSize: '1.05rem', marginBottom: 4}}>Categoría:<br/>
+            <select value={filtros.categoria} onChange={e => setFiltros(f => ({...f, categoria: e.target.value}))} style={{width: 95, fontSize: '1.05rem', padding: 7, borderRadius: 7, border: '1.5px solid #8B0000', marginTop: 3}}>
+              <option value="">Todas</option>
+              {categorias.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </div>
+      {Array.isArray(productosFiltrados) && productosFiltrados.length > 0 ? (
         <div style={styles.galeria}>
-          {productos.map(p => (
+          {productosFiltrados.map(p => (
             <ProductCard key={p.id} producto={p} />
           ))}
         </div>
